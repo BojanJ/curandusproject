@@ -5,7 +5,7 @@ import java.util.Date;
 public class TreatmentItem {
 	
 	private Integer treatmentItemId;
-	private Integer treatmentID;
+	private Integer subtreatmentid;
 	private String name;
 	private String typeT;
 	private String repeatT;
@@ -19,10 +19,10 @@ public class TreatmentItem {
 	public TreatmentItem() {
 	}
 
-	public TreatmentItem(Integer treatmentItemId, Integer treatmentID, String name, String typeT, String repeatT, String duration,
+	public TreatmentItem(Integer treatmentItemId, Integer subtreatmentid, String name, String typeT, String repeatT, String duration,
 			String renderingInfo, Date created, Integer createdBy, Date modified, Integer modifiedBy) {
 		this.treatmentItemId=treatmentItemId;
-		this.treatmentID = treatmentID;
+		this.subtreatmentid = subtreatmentid;
 		this.name = name;
 		this.typeT = typeT;
 		this.repeatT = repeatT;
@@ -42,12 +42,12 @@ public class TreatmentItem {
 		this.treatmentItemId = treatmentItemId;
 	}
 
-	public Integer getTreatmentID() {
-		return treatmentID;
+	public Integer getSubtreatmentid() {
+		return subtreatmentid;
 	}
 
-	public void setTreatmentID(Integer treatmentID) {
-		this.treatmentID = treatmentID;
+	public void setSubtreatmentid(Integer subtreatmentid) {
+		this.subtreatmentid = subtreatmentid;
 	}
 
 	public String getName() {

@@ -8,11 +8,136 @@ import com.database.Database;
 import com.database.Project;
 import com.model.PatientsCascade;
 import com.model.Providers;
+import com.model.SavedTemplate;
 import com.model.TreatmentItem;
+import com.model.TreatmentItemListScroll;
 
 public class ProjectManager {
 	
+	public List<SavedTemplate> getSavedTemplate(int providerDetail) throws Exception {
+		List<SavedTemplate> t_items = null;
+		try {
+			    Database database= new Database();
+			    Connection connection = database.Get_Connection();
+				Project project= new Project();
+				t_items=project.getSavedTemplate(connection, providerDetail);
+		
+		} catch (Exception e) {
+			throw e;
+		}
+		return t_items;
+	}	
 	
+	public List<TreatmentItemListScroll> getTreatmentItemListLoad(int p_activetreatmentid) throws Exception {
+		List<TreatmentItemListScroll> t_items = null;
+		try {
+			    Database database= new Database();
+			    Connection connection = database.Get_Connection();
+				Project project= new Project();
+				t_items=project.getTreatmentItemListLoad(connection,p_activetreatmentid);
+		} catch (Exception e) {
+			throw e;
+		}
+		return t_items;
+	}	
+
+	public List<TreatmentItemListScroll> getTreatmentItemListScroll(int TreatmentItemListID, 
+			String T_UP_DOWN, int range) throws Exception {
+		List<TreatmentItemListScroll> t_items = null;
+		try {
+			    Database database= new Database();
+			    Connection connection = database.Get_Connection();
+				Project project= new Project();
+				t_items=project.getTreatmentItemListScroll(connection,TreatmentItemListID,T_UP_DOWN, range);
+		} catch (Exception e) {
+			throw e;
+		}
+		return t_items;
+	}		
+	
+public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtreatmentid) throws Exception
+{		
+		boolean flag;
+		try{
+		    Database database= new Database();
+		    Connection connection = database.Get_Connection();
+			Project project= new Project();
+			flag=project.UpdateSavedTreatment(connection, t_items, p_savedtreatmentid);
+		} 
+		
+		catch (Exception e) {
+			throw e;		
+		}
+			return flag;
+}	
+	public boolean UpdateActiveSubTreatment(List<TreatmentItem> t_items) throws Exception
+{		
+		boolean flag;
+		try{
+		    Database database= new Database();
+		    Connection connection = database.Get_Connection();
+			Project project= new Project();
+			flag=project.UpdateActiveSubTreatment(connection, t_items);
+		} 
+		
+		catch (Exception e) {
+			throw e;		
+		}
+			return flag;
+}	
+	
+	public int CheckNameSavedTreatment(int ProviderID, 
+			String NameTreatment, List<TreatmentItem> t_items) throws Exception
+	{
+		int flag;
+		try{
+		    Database database= new Database();
+		    Connection connection = database.Get_Connection();
+			Project project= new Project();
+			flag=project.CheckNameSavedTreatment(connection, ProviderID, NameTreatment, t_items);
+		}
+		catch (Exception e) {
+			throw e;		
+		}
+		
+		return flag;
+	}	
+	
+	public boolean InsertSavedTreatment(int ProviderID, 
+			String NameTreatment, List<TreatmentItem> t_items) throws Exception
+	{
+		boolean flag;
+		try{
+		    Database database= new Database();
+		    Connection connection = database.Get_Connection();
+			Project project= new Project();
+			flag=project.InsertSavedTreatment(connection, ProviderID, NameTreatment, t_items);
+		}
+		catch (Exception e) {
+			throw e;		
+		}
+		
+		return flag;
+	}
+	
+	public int InsertActiveSubTreatment(int activeTreatmentID , 
+			int ProviderID, int PatientID, String NameTreatment, String SubNameTreatment, 
+			List<TreatmentItem> t_items) throws Exception
+{		
+		int flag=0;
+		try{
+		    Database database= new Database();
+		    Connection connection = database.Get_Connection();
+			Project project= new Project();
+			flag=project.InsertActiveSubTreatment(connection, activeTreatmentID, ProviderID, PatientID, NameTreatment, SubNameTreatment, t_items);
+		} 
+		
+		catch (Exception e) {
+			throw e;		
+		}
+			return flag;
+}	
+
 	public Providers InsertProvider(Providers p_provider) throws Exception {
 		Providers t_items= new Providers();
 		try {
