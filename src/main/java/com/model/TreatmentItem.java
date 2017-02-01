@@ -11,6 +11,7 @@ public class TreatmentItem {
 	private String repeatT;
 	private String duration;
 	private String renderingInfo;
+	private String status;
 	private Date created;
 	private Integer createdBy;
 	private Date modified;
@@ -19,15 +20,18 @@ public class TreatmentItem {
 	public TreatmentItem() {
 	}
 
-	public TreatmentItem(Integer treatmentItemId, Integer subtreatmentid, String name, String typeT, String repeatT, String duration,
-			String renderingInfo, Date created, Integer createdBy, Date modified, Integer modifiedBy) {
-		this.treatmentItemId=treatmentItemId;
+	public TreatmentItem(Integer treatmentItemId, Integer subtreatmentid, String name, String typeT, String repeatT,
+			String duration, String renderingInfo, String status, Date created, Integer createdBy, Date modified,
+			Integer modifiedBy) {
+		super();
+		this.treatmentItemId = treatmentItemId;
 		this.subtreatmentid = subtreatmentid;
 		this.name = name;
 		this.typeT = typeT;
 		this.repeatT = repeatT;
 		this.duration = duration;
 		this.renderingInfo = renderingInfo;
+		this.status = status;
 		this.created = created;
 		this.createdBy = createdBy;
 		this.modified = modified;
@@ -90,6 +94,14 @@ public class TreatmentItem {
 		this.renderingInfo = renderingInfo;
 	}
 
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	public Date getCreated() {
 		return created;
 	}
@@ -121,4 +133,5 @@ public class TreatmentItem {
 	public void setModifiedBy(Integer modifiedBy) {
 		this.modifiedBy = modifiedBy;
 	}
+	
 }
