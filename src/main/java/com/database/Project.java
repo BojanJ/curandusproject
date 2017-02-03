@@ -10,12 +10,16 @@ import java.util.List;
 import javax.ws.rs.WebApplicationException;
 
 import com.google.gson.Gson;
+import com.model.Patients;
 import com.model.PatientsCascade;
+import com.model.ProviderProvider;
 import com.model.Providers;
 import com.model.SavedTemplate;
 import com.model.TreatmentItem;
+import com.model.TreatmentItemList;
 import com.model.TreatmentItemListScroll;
 import com.mysql.jdbc.Statement;
+import com.sun.jersey.api.NotFoundException;
 
 public class Project {
 	
@@ -36,7 +40,7 @@ public class Project {
 			try
 			{
 				ps = connection.prepareStatement("CALL GetSavedTreatmentTemplateByProviderId(?)");
-				ps.setInt(3,ProviderDetail);
+				ps.setInt(1,ProviderDetail);
 				ResultSet rs = ps.executeQuery();
 				while(rs.next())
 				{
@@ -657,19 +661,7 @@ public class Project {
 										rs.getDate(11),
 										rs.getInt(12)
 										);
-//					System.out.println("Modified "+p_eden.getModified());
-//					p_eden.setTreatmentItemId(rs.getInt(1));
-//					p_eden.setTreatmentID(rs.getInt(2));
-//					p_eden.setName(rs.getString(3));
-//					p_eden.setTypeT(rs.getString(4));
-//					p_eden.setRepeatT(rs.getString(5));
-//					p_eden.setDuration(rs.getString(6));
-//					p_eden.setRenderingInfo(rs.getString(7));
-//					p_eden.setCreated(rs.getDate(8));
-//					p_eden.setCreatedBy(rs.getInt(9));
-//					System.out.println("Modified "+rs.getDate(10));
-//					p_eden.setModified(rs.getDate(10));
-//					p_eden.setModifiedBy(rs.getInt(11));
+			
 
 					t_items.add(p_eden);
 				}
@@ -692,4 +684,176 @@ public class Project {
 				connection.close();
 				}
 	}
+	
+	
+	public Patients getPatientsData(Connection connection , int patientId) throws Exception
+	{
+		Patients t_items = new Patients();
+		PreparedStatement ps=null;
+			try
+			{
+				//String uname = request.getParameter("uname");
+				//PreparedStatement ps = connection.prepareStatement("SELECT SavedTreatmentItemId, SavedTreatmentDetail, Name, TypeT, RepeatT, Duration, RenderingInfo, Created, CreatedBy, Modified, ModifiedBy FROM savedtreatmentitem WHERE savedtreatmentdetail=?");
+			    ps = connection.prepareStatement("CALL getPatientData(?)");
+				ps.setInt(1,patientId);
+				ResultSet rs = ps.executeQuery();
+				while(rs.next())
+				{
+					//TreatmentItem p_eden = new TreatmentItem();
+					
+					Patients p_eden = new Patients(
+										rs.getInt(1),
+										rs.getString(2),
+										rs.getString(3),
+										rs.getString(4),
+										rs.getString(5),
+										rs.getString(5),
+										rs.getString(6),
+										rs.getString(7),
+										rs.getString(8),
+										rs.getString(9),
+										rs.getString(10),
+										rs.getString(11),
+										rs.getString(12),
+										rs.getString(13),
+										rs.getDate(14),
+										rs.getInt(15),
+										rs.getDate(16),
+										rs.getInt(17)
+										);
+					t_items = p_eden;
+				}
+				
+				if (t_items.getPatientId() == 0){
+					 throw new NotFoundException();
+				}
+				else
+				{
+					return t_items;
+				}
+			}  
+				catch(Exception  e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			finally{
+					ps.close();
+			        connection.close();
+			}
+	}
+	
+	
+	
+	public TreatmentItemList updatetreatmenitemlist(Connection connection, TreatmentItemList t_items, int TreatmentItemListId) throws Exception
+	{	
+		connection.setAutoCommit(false);
+		PreparedStatement pss=null;
+		System.out.println("start");
+				Gson gson = new Gson();
+			try{
+				pss =connection.prepareStatement("call updateTreatmentItemList(?,?,?,?,?,?,?,?,?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS); 
+				pss.setInt(1,NVL(t_items.getTreatmentItemListId())); 
+				pss.setInt(2,NVL(t_items.getTreatmentitem())); 
+				pss.setString(3,t_items.getLabel()); 
+				pss.setDate(4,(Date) t_items.getTimeScheduled()); 
+				pss.setDate(5,(Date) t_items.getTimeDone()); 
+				pss.setDate(6,(Date) t_items.getTimeRemove()); 
+				pss.setString(7,t_items.getStatus()); 
+				pss.setString(8,t_items.getRenderingInfo()); 
+				pss.setString(9,t_items.getResponseInfo()); 
+				pss.setDate(10,(Date) t_items.getCreated()); 
+				pss.setInt(11,t_items.getCreatedBy()); 
+				pss.setDate(12,(Date) t_items.getModified()); 
+				pss.setInt(13,t_items.getModifiedBy()); 				
+				
+				System.out.println("Tuka rezultat"+pss.toString()); 
+				ResultSet rs = pss.executeQuery(); 
+				System.out.println("Tuka rezultat"+pss.toString()); 
+				while(rs.next())
+				{	
+					TreatmentItemList p_eden = new TreatmentItemList(
+										rs.getInt(1), 
+										rs.getInt(2), 
+										rs.getString(3),
+										rs.getTimestamp(4),
+										rs.getTimestamp(5),
+										rs.getTimestamp(6),
+										rs.getString(7),
+										rs.getString(8),
+										rs.getString(9),
+										rs.getDate(10),
+										rs.getInt(11),
+										rs.getDate(12),
+										rs.getInt(13)
+																			
+										);
+					t_items=p_eden;
+				}
+				
+				//pss.executeQuery();
+			
+				connection.commit(); 
+				return t_items;
+		}
+		catch(Exception e)
+		{
+			connection.rollback();
+			e.printStackTrace();
+			throw e;
+		}
+
+		finally {
+				pss.close();
+				connection.close();
+		}
+	}
+	
+	
+	
+	public List<ProviderProvider> getprovidersdatabyprovider(Connection connection, int ProviderDetail) throws Exception
+	{
+		List<ProviderProvider> t_items = new ArrayList<ProviderProvider>();
+		PreparedStatement ps=null;
+			try
+			{
+				ps = connection.prepareStatement("CALL getprovidersdatabyprovider(?)");
+				ps.setInt(1,ProviderDetail);
+				ResultSet rs = ps.executeQuery();
+				while(rs.next())
+				{
+					ProviderProvider p_eden = new ProviderProvider(
+							rs.getInt(1),
+							rs.getInt(2),
+							rs.getInt(3),
+							rs.getString(4),
+							rs.getString(5),
+							rs.getDate(6),
+							rs.getInt(7),
+							rs.getDate(8),
+							rs.getInt(9)
+										);
+					t_items.add(p_eden);
+				}
+				
+				if (t_items.isEmpty()){
+					 throw new WebApplicationException(404);
+				}
+				else
+				{
+					return t_items;
+				}
+			}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			finally {
+				ps.close();
+				connection.close();
+				}
+	}	
+	
+	
 }

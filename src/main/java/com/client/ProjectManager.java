@@ -6,10 +6,13 @@ import java.util.List;
 
 import com.database.Database;
 import com.database.Project;
+import com.model.Patients;
 import com.model.PatientsCascade;
+import com.model.ProviderProvider;
 import com.model.Providers;
 import com.model.SavedTemplate;
 import com.model.TreatmentItem;
+import com.model.TreatmentItemList;
 import com.model.TreatmentItemListScroll;
 
 public class ProjectManager {
@@ -205,6 +208,52 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 			throw e;
 		}
 		return t_items;
-	}			
+	}	
 	
+	public Patients getPatientData(int patientId) throws Exception {
+		Patients t_items = null;
+		try {
+			    Database database= new Database();
+			    Connection connection = database.Get_Connection();
+				Project project= new Project();
+				t_items=project.getPatientsData(connection,patientId);
+		
+		} catch (Exception e) {
+			throw e;
+		}
+		return t_items;
+	}
+	
+	
+	public TreatmentItemList updatetreatmenitemlist(TreatmentItemList t_items, int TreatmentItemListId) throws Exception
+	{		
+		TreatmentItemList flag;
+			try{
+			    Database database= new Database();
+			    Connection connection = database.Get_Connection();
+				Project project= new Project();
+				flag=project.updatetreatmenitemlist(connection, t_items, TreatmentItemListId);
+			} 
+			
+			catch (Exception e) {
+				throw e;		
+			}
+				return flag;
+	}
+	
+	
+	
+	public List<ProviderProvider> getprovidersdatabyprovider(int ProviderProviderId) throws Exception {
+		List<ProviderProvider> t_items = null;
+		try {
+			    Database database= new Database();
+			    Connection connection = database.Get_Connection();
+				Project project= new Project();
+				t_items=project.getprovidersdatabyprovider(connection, ProviderProviderId);
+		
+		} catch (Exception e) {
+			throw e;
+		}
+		return t_items;
+	}	
 }	

@@ -14,10 +14,13 @@ import javax.ws.rs.core.Response;
 
 import com.client.ProjectManager;
 import com.google.gson.Gson;
+import com.model.Patients;
 import com.model.PatientsCascade;
+import com.model.ProviderProvider;
 import com.model.Providers;
 import com.model.SavedTemplate;
 import com.model.TreatmentItem;
+import com.model.TreatmentItemList;
 import com.model.TreatmentItemListScroll;
 
 
@@ -46,7 +49,7 @@ public class JSONService {
 //	}
 	
 	@GET
-	@Path("/SavedTemplate/ProviderDetail={ProviderDetail}")
+	@Path("/getSavedTreatmentTemplateByProvider/ProviderDetail={ProviderDetail}")
 	@Produces("application/json")
    public String getSavedTemplate(@PathParam("ProviderDetail")int ProviderDetail)
 	{
@@ -353,7 +356,9 @@ public class JSONService {
 			System.out.println(gson.toJson(flag));
 			t_tems_str = gson.toJson(flag);
 
-		} catch (Exception e)
+		} 
+		
+		catch (Exception e)
 		{
 			System.out.println("error");
 		}
@@ -376,11 +381,88 @@ public class JSONService {
 			Gson gson = new Gson();
 			System.out.println(gson.toJson(t_items));
 			t_tems_str = gson.toJson(t_items);
+			return t_items;
+		} 
+		
+		catch (Exception e)
+		{
+			System.out.println("error");
+			return null;
+		}
+		
+	}		
+	
+	
+	@GET
+	@Path("/getPatientsData/patientId={patientId}")
+	@Produces("application/json")
+   public Patients getPatientData(@PathParam("patientId")int patientId) throws Exception 
+	{
+		//System.out.println("1s");
+		Patients t_items = null;
+		String t_tems_str  = null;
+		try 
+		{
+			ProjectManager projectManager= new ProjectManager();
+			t_items = projectManager.getPatientData(patientId);
+			Gson gson = new Gson();
+			System.out.println(gson.toJson(t_items));
+			t_tems_str = gson.toJson(t_items);
+			return t_items;
+		} 
+		
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}		
+		
+	}
+	
+	
+	@POST
+	@Path("/updatetreatmenitemlist/TreatmentItemListId={TreatmentItemListId}")
+	@Produces("application/json")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String updatetreatmenitemlist(@PathParam("TreatmentItemListId")int TreatmentItemListId,TreatmentItemList t_items) {
+		
+		ProjectManager projectManager= new ProjectManager();
+		TreatmentItemList flag;
+		String t_tems_str = null;
+		try {
+			flag = projectManager.updatetreatmenitemlist(t_items, TreatmentItemListId);
+			Gson gson = new Gson();
+			System.out.println(gson.toJson(flag));
+			t_tems_str = gson.toJson(flag);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return t_tems_str;
+	}
+	
+
+	@GET
+	@Path("/getprovidersdatabyprovider/ProviderProviderId={ProviderProviderId}")
+	@Produces("application/json")
+   public String getprovidersdatabyprovider(@PathParam("ProviderProviderId")int ProviderProviderId)
+	{
+		List<ProviderProvider> t_items = null;
+		String t_tems_str  = null;
+		try 
+		{
+			ProjectManager projectManager= new ProjectManager();
+			t_items = projectManager.getprovidersdatabyprovider(ProviderProviderId);
+			Gson gson = new Gson();
+			System.out.println(gson.toJson(t_items));
+			t_tems_str = gson.toJson(t_items);
 
 		} catch (Exception e)
 		{
 			System.out.println("error");
 		}
-		return t_items;
-	}		
+		return t_tems_str;
+	}	
+	
+	
 }
