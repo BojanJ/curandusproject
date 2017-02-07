@@ -51,7 +51,7 @@ public class JSONService {
 //	}
 	
 	@GET
-	@Path("/getSavedTreatmentTemplateByProvider/ProviderDetail={ProviderDetail}")
+	@Path("/getsavedtreatmenttemplatebyprovider/{ProviderDetail}")
 	@Produces("application/json")
    public String getSavedTemplate(@PathParam("ProviderDetail")int ProviderDetail)
 	{
@@ -467,6 +467,29 @@ public class JSONService {
 		}
 		return t_tems_str;
 	}	
+	
+	
+	@POST 
+	@Path("/CheckProviderActivationKey/{deviceId}&&{phone}&&{ActivationCode}") 
+    @Produces("application/json") 
+    public Providers CheckProviderActivationKey(@PathParam("deviceId")String deviceId,@PathParam("phone")String phone ,@PathParam("ActivationCode")int ActivationCode){
+		ProjectManager projectManager= new ProjectManager();
+		Providers provider = new Providers();
+		String t_tems_str = null;
+		try {
+			provider = projectManager.CheckProviderActivationKey(deviceId, phone, ActivationCode);
+//			Gson gson = new Gson();
+//			System.out.println(gson.toJson(t_items));
+//			t_tems_str = gson.toJson(t_items);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return provider;
+	}
+	
+	
 	
 	
 }

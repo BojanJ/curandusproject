@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -777,7 +778,7 @@ public class Project {
 				pss.setInt(1,NVL(t_items.getTreatmentItemListId())); 
 				pss.setInt(2,NVL(t_items.getTreatmentitem())); 
 				pss.setString(3,t_items.getLabel()); 
-				pss.setDate(4,(Date) t_items.getTimeScheduled()); 
+				pss.setDate(4, (Date)t_items.getTimeScheduled());
 				pss.setDate(5,(Date) t_items.getTimeDone()); 
 				pss.setDate(6,(Date) t_items.getTimeRemove()); 
 				pss.setString(7,t_items.getStatus()); 
@@ -875,6 +876,56 @@ public class Project {
 				connection.close();
 				}
 	}	
+	
+	
+	///// tuka api activation
+	public Providers CheckProviderActivationKey(Connection connection, String deviceId , String phone , int inputCode) throws Exception
+	{
+		PreparedStatement ps=null;
+		Providers result=new Providers();
+		try
+		{
+		    ps =connection.prepareStatement("call CheckProviderActivationKey(?,?,?)", Statement.RETURN_GENERATED_KEYS);
+		    ps.setString(1,deviceId);
+		    ps.setString(2,phone);
+		    ps.setInt(3, inputCode);
+		   		
+			ResultSet rs = ps.executeQuery();
+			
+			if (rs.next()){
+				result.setProviderId(rs.getInt(1));
+				result.setFirstName(rs.getString(2));
+				result.setTypeProvider(rs.getString(3));
+				result.setMiddleInitial(rs.getString(4));
+				result.setLastName(rs.getString(5));
+				result.setStreetAdress(rs.getString(6));
+				result.setCity(rs.getString(7));
+				result.setState(rs.getString(8));
+				result.setZip(rs.getString(9));
+				result.setPhone(rs.getString(10));
+				result.setAlternatePhone(rs.getString(11));
+				result.setStatus(rs.getInt(12));
+				result.setCreated(rs.getDate(13));
+				result.setCreatedBy(rs.getInt(14));
+				result.setModified(rs.getDate(15));
+				result.setModifiedBy(rs.getInt(16));
+				result.setDeviceId(rs.getString(17));
+				result.setActivationCode(rs.getInt(18));
+				
+			}
+			return result;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+
+		finally {
+				ps.close();
+		      connection.close();
+		}
+	}
 	
 	
 }

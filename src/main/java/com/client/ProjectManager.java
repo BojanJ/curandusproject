@@ -18,6 +18,21 @@ import com.model.TreatmentItemListScroll;
 
 public class ProjectManager {
 	
+
+	public Providers CheckProviderActivationKey(String deviceId , String phone , int inputCode) throws Exception {
+		Providers t_items = new Providers();
+		try {
+			    Database database= new Database();
+			    Connection connection = database.Get_Connection();
+				Project project= new Project();
+				t_items=project.CheckProviderActivationKey(connection, deviceId , phone , inputCode);
+		
+		} catch (Exception e) {
+			throw e;
+		}
+		return t_items;
+	}	
+	
 	public List<SavedTemplate> getSavedTemplate(int providerDetail) throws Exception {
 		List<SavedTemplate> t_items = null;
 		try {

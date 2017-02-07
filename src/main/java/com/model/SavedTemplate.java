@@ -3,7 +3,7 @@ package com.model;
 import java.util.Date;
 
 public class SavedTemplate {
-	private int savedTemplateId;
+	private int savedTreatmentTemplateId;
 	private String nameTreatment;
 	private int providerDetail;
 	private Date created;
@@ -13,10 +13,10 @@ public class SavedTemplate {
 	
 	public SavedTemplate(){};
 	
-	public SavedTemplate(int savedTemplateId, String nameTreatment, int providerDetail, Date created, int createdBy,
+	public SavedTemplate(int savedTreatmentTemplateId, String nameTreatment, int providerDetail, Date created, int createdBy,
 			Date modified, int modifiedBy) {
 		super();
-		this.savedTemplateId = savedTemplateId;
+		this.savedTreatmentTemplateId = savedTreatmentTemplateId;
 		this.nameTreatment = nameTreatment;
 		this.providerDetail = providerDetail;
 		this.created = created;
@@ -25,11 +25,11 @@ public class SavedTemplate {
 		this.modifiedBy = modifiedBy;
 	}
 	
-	public int getSavedTemplateId() {
-		return savedTemplateId;
+	public int getSavedTreatmentTemplateId() {
+		return savedTreatmentTemplateId;
 	}
-	public void setSavedTemplateId(int savedTemplateId) {
-		this.savedTemplateId = savedTemplateId;
+	public void setSavedTreatmentTemplateId(int savedTreatmentTemplateId) {
+		this.savedTreatmentTemplateId = savedTreatmentTemplateId;
 	}
 	public String getNameTreatment() {
 		return nameTreatment;
