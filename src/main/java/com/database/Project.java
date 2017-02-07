@@ -15,6 +15,7 @@ import com.model.PatientsCascade;
 import com.model.ProviderProvider;
 import com.model.Providers;
 import com.model.SavedTemplate;
+import com.model.SubTreatment;
 import com.model.TreatmentItem;
 import com.model.TreatmentItemList;
 import com.model.TreatmentItemListScroll;
@@ -237,17 +238,32 @@ public class Project {
 
 		finally {
 				pss.close();
+				ps.close();
 				connection.close();
 		}
 	}	
 	
-	public boolean UpdateActiveSubTreatment(Connection connection, List<TreatmentItem> t_items) throws Exception
+	public boolean UpdateActiveSubTreatment(Connection connection, List<TreatmentItem> t_items, int p_subtreatmentid) throws Exception
 	{	
 		PreparedStatement pss=null;
+		PreparedStatement ps=null;
 		System.out.println("start");
+		String listadeleteobicna="0";
 				Gson gson = new Gson();
 			try{
 				connection.setAutoCommit(false);
+				for(TreatmentItem tt:t_items)
+				{
+					listadeleteobicna=listadeleteobicna+","+NVL(tt.getTreatmentItemId()).toString();
+					//listaDelete.add(tt.getTreatmentItemId().toString());
+				}
+				
+				ps =connection.prepareStatement("call RemoveTreatmentItem(?,?)",Statement.RETURN_GENERATED_KEYS);
+				ps.setString(1, listadeleteobicna);
+				ps.setInt(2, NVL(p_subtreatmentid));
+				ps.executeQuery();				
+				
+				
 				pss =connection.prepareStatement("call InsertUpdateTreatmentItem(?,?,?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS);
 				for(TreatmentItem tt:t_items)
 				{
@@ -394,12 +410,13 @@ public class Project {
 		}
 	}	
 	
-	public int InsertActiveSubTreatment(Connection connection, int activeTreatmentID , 
+	public SubTreatment InsertActiveSubTreatment(Connection connection, int activeTreatmentID , 
 			int ProviderID, int PatientID, String NameTreatment, String SubNameTreatment, 
 			List<TreatmentItem> t_items) throws Exception
 	{	
 		PreparedStatement ps=null;
 		PreparedStatement pss=null;
+		SubTreatment ret_sub_t=new SubTreatment();
 		int p_subTreatmentID;
 		int ret_active_treatment=0;
 	
@@ -417,9 +434,11 @@ public class Project {
 			
 			if (rs.next()){
 				p_subTreatmentID=rs.getInt(1);
+				ret_sub_t.setSubtreatmentid(rs.getInt(1));
 				
 				ret_active_treatment=rs.getInt(2);
-				
+				ret_sub_t.setActivetreatmentid(rs.getInt(2));
+
 				Gson gson = new Gson();
 
 				connection.setAutoCommit(false);
@@ -440,7 +459,8 @@ public class Project {
 				//pss.executeQuery();
 			}
 			connection.commit(); 
-			return ret_active_treatment;
+			
+			return ret_sub_t;
 		}
 		catch(Exception e)
 		{
@@ -525,7 +545,8 @@ public class Project {
 										rs.getString(3),
 										rs.getString(4),
 										rs.getString(5),
-										rs.getInt(6)
+										rs.getInt(6),
+										rs.getInt(7)
 										);
 					t_items.add(p_eden);
 				}
