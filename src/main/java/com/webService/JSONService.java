@@ -469,10 +469,11 @@ public class JSONService {
 	}	
 	
 	
-	@POST 
+	@GET
 	@Path("/CheckProviderActivationKey/{deviceId}&&{phone}&&{ActivationCode}") 
     @Produces("application/json") 
-    public Providers CheckProviderActivationKey(@PathParam("deviceId")String deviceId,@PathParam("phone")String phone ,@PathParam("ActivationCode")int ActivationCode){
+    public Providers CheckProviderActivationKey(@PathParam("deviceId")String deviceId,@PathParam("phone")String phone ,@PathParam("ActivationCode")int ActivationCode)throws Exception 
+	{
 		ProjectManager projectManager= new ProjectManager();
 		Providers provider = new Providers();
 		String t_tems_str = null;
@@ -481,12 +482,14 @@ public class JSONService {
 //			Gson gson = new Gson();
 //			System.out.println(gson.toJson(t_items));
 //			t_tems_str = gson.toJson(t_items);
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return provider;
 		}
-		return provider;
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throw e;
+			}
+		
 	}
 	
 	
