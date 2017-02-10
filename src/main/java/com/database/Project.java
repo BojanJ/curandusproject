@@ -1,5 +1,6 @@
 package com.database;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -10,6 +11,7 @@ import java.util.List;
 import javax.ws.rs.WebApplicationException;
 
 import com.google.gson.Gson;
+import com.model.ActiveTreatment;
 import com.model.Patients;
 import com.model.PatientsCascade;
 import com.model.ProviderProvider;
@@ -820,7 +822,6 @@ public class Project {
 				ps = connection.prepareStatement("CALL getprovidersdatabyprovider(?)");
 				ps.setInt(1,ProviderDetail);
 				ResultSet rs = ps.executeQuery();
-				while(rs.next())
 				{
 					ProviderProvider p_eden = new ProviderProvider(
 							rs.getInt(1),
@@ -853,6 +854,42 @@ public class Project {
 				ps.close();
 				connection.close();
 				}
+	}	
+	
+
+	
+	public boolean EndTreatment(Connection connection, int ActiveTreatmentId) throws Exception
+	{	
+		PreparedStatement ps=null;
+		int p_ActiveTreatmentId;
+		boolean flag=false;
+		try
+		{
+			ps = connection.prepareCall("call EndTreatment(?)");
+			ps.setInt(1,ActiveTreatmentId);
+		   
+
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()){
+				flag=(rs.getBoolean(1));
+			}	
+			
+			if (flag==false){
+				 throw new WebApplicationException(404);
+			}
+			else  
+			{
+			return flag;
+			}
+			}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+		finally {
+			connection.close();
+		}
 	}	
 	
 	

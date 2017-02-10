@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.database.Database;
 import com.database.Project;
+import com.model.ActiveTreatment;
 import com.model.Patients;
 import com.model.PatientsCascade;
 import com.model.ProviderProvider;
@@ -255,5 +256,26 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 			throw e;
 		}
 		return t_items;
-	}	
+	}
+	
+	
+
+	
+	public boolean EndTreatment(int ActiveTreatmentId) throws Exception
+	{
+		boolean flag;
+		try{
+		    Database database= new Database();
+		    Connection connection = database.Get_Connection();
+			Project project= new Project();
+			flag=project.EndTreatment(connection, ActiveTreatmentId);
+		}
+		catch (Exception e) {
+			throw e;		
+		}
+		
+		return flag;
+	}
+	
+	
 }	

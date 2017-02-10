@@ -465,4 +465,28 @@ public class JSONService {
 	}	
 	
 	
+	@POST
+	@Path("/EndTreatment/ActiveTreatmentId={ActiveTreatmentId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces("application/json")
+	public String EndTreatment(@PathParam("ActiveTreatmentId") Integer ActiveTreatmentId) throws Exception  {	
+		ProjectManager projectManager= new ProjectManager();
+		boolean flag = false;
+		String t_tems_str = null;
+		try {
+			flag = projectManager.EndTreatment( ActiveTreatmentId);
+			Gson gson = new Gson();
+			System.out.println(gson.toJson(flag));
+			t_tems_str = gson.toJson(flag);
+			return t_tems_str;
+		} 
+		
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}	
+		
+	}	
+	
 }
