@@ -90,9 +90,9 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 		}
 			return flag;
 }	
-	public boolean UpdateActiveSubTreatment(List<TreatmentItem> t_items, int p_subtreatmentid) throws Exception
+	public SubTreatment UpdateActiveSubTreatment(List<TreatmentItem> t_items, int p_subtreatmentid) throws Exception
 {		
-		boolean flag;
+		SubTreatment flag=new SubTreatment();;
 		try{
 		    Database database= new Database();
 		    Connection connection = database.Get_Connection();

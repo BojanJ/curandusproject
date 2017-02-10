@@ -155,7 +155,7 @@ public class JSONService {
 	public String InsertActiveSubTreatment(@PathParam("p_subtreatmentid") Integer p_subtreatmentid,List<TreatmentItem> t_items) {
 		
 		ProjectManager projectManager= new ProjectManager();
-		boolean flag=false;
+		SubTreatment flag=new SubTreatment();
 		String t_tems_str = null;
 		try {
 			flag = projectManager.UpdateActiveSubTreatment(t_items,p_subtreatmentid);

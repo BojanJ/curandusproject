@@ -246,12 +246,17 @@ public class Project {
 		}
 	}	
 	
-	public boolean UpdateActiveSubTreatment(Connection connection, List<TreatmentItem> t_items, int p_subtreatmentid) throws Exception
+	public SubTreatment UpdateActiveSubTreatment(Connection connection, List<TreatmentItem> t_items, int p_subtreatmentid) throws Exception
 	{	
 		PreparedStatement pss=null;
 		PreparedStatement ps=null;
+		PreparedStatement pss1=null;
+		
 		System.out.println("start");
 		String listadeleteobicna="0";
+		
+		SubTreatment ret_sub=new SubTreatment();
+		
 				Gson gson = new Gson();
 			try{
 				connection.setAutoCommit(false);
@@ -272,7 +277,7 @@ public class Project {
 				{
 					System.out.println("ID "+NVL(tt.getTreatmentItemId()));
 					pss.setInt(1,NVL(tt.getTreatmentItemId()));
-					pss.setInt(2, NVL(tt.getSubtreatmentid()));
+					pss.setInt(2, NVL(p_subtreatmentid));
 					pss.setString(3, tt.getName());
 					pss.setString(4, tt.getRepeatT());
 					pss.setString(5, tt.getTypeT());
@@ -283,9 +288,20 @@ public class Project {
 				}
 				pss.executeBatch();
 				//pss.executeQuery();
-			
+				pss1 =connection.prepareStatement("call GetIds(?)",Statement.RETURN_GENERATED_KEYS);
+				pss1.setInt(1, p_subtreatmentid);
+				
+				ResultSet rs1 = pss1.executeQuery();
+				while(rs1.next())
+				{
+					ret_sub.setSubtreatmentid(rs1.getInt(1));
+					ret_sub.setActivetreatmenId(rs1.getInt(2));
+					ret_sub.setPatientId(rs1.getInt(3));
+				}				
+				
+				
 				connection.commit(); 
-				return true;
+				return ret_sub;
 		}
 		catch(Exception e)
 		{
@@ -440,7 +456,9 @@ public class Project {
 				ret_sub_t.setSubtreatmentid(rs.getInt(1));
 				
 				ret_active_treatment=rs.getInt(2);
-				ret_sub_t.setActivetreatmentid(rs.getInt(2));
+				ret_sub_t.setActivetreatmenId(rs.getInt(2));
+				
+				ret_sub_t.setPatientId(PatientID);
 
 				Gson gson = new Gson();
 
