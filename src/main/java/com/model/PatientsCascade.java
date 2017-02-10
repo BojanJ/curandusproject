@@ -9,19 +9,21 @@ public class PatientsCascade {
 	private String lastName;
 	//private Set<Providerpatient> providerpatients = new HashSet<Providerpatient>(0);
 	private Integer activetreatmenId;
+	private Integer subtreatmentid;
 
 	public PatientsCascade() {
 	}
 
-	public PatientsCascade(Integer patientId, String phone, String firstName, String middleInitial,String lastName,
-			Integer activetreatmenId) {
-		this.patientId=patientId;
+	public PatientsCascade(Integer patientId, String phone, String firstName, String middleInitial, String lastName,
+			Integer activetreatmenId, Integer subtreatmentid) {
+		super();
+		this.patientId = patientId;
 		this.phone = phone;
 		this.firstName = firstName;
 		this.middleInitial = middleInitial;
 		this.lastName = lastName;
-	//	this.providerpatients = providerpatients;
 		this.activetreatmenId = activetreatmenId;
+		this.subtreatmentid = subtreatmentid;
 	}
 
 	public Integer getPatientId() {
@@ -70,5 +72,13 @@ public class PatientsCascade {
 
 	public void setActivetreatmenId(Integer activetreatmenId) {
 		this.activetreatmenId = activetreatmenId;
+	}
+
+	public Integer getSubtreatmentid() {
+		return subtreatmentid;
+	}
+
+	public void setSubtreatmentid(Integer subtreatmentid) {
+		this.subtreatmentid = subtreatmentid;
 	}
 }

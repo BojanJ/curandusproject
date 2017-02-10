@@ -9,6 +9,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -19,6 +20,7 @@ import com.model.PatientsCascade;
 import com.model.ProviderProvider;
 import com.model.Providers;
 import com.model.SavedTemplate;
+import com.model.SubTreatment;
 import com.model.TreatmentItem;
 import com.model.TreatmentItemList;
 import com.model.TreatmentItemListScroll;
@@ -49,7 +51,7 @@ public class JSONService {
 //	}
 	
 	@GET
-	@Path("/getSavedTreatmentTemplateByProvider/ProviderDetail={ProviderDetail}")
+	@Path("/getsavedtreatmenttemplatebyprovider/{ProviderDetail}")
 	@Produces("application/json")
    public String getSavedTemplate(@PathParam("ProviderDetail")int ProviderDetail)
 	{
@@ -148,15 +150,15 @@ public class JSONService {
 	}	
 	
 	@POST
-	@Path("/UpdateActiveSubTreatment")
+	@Path("/UpdateActiveSubTreatment/subtreatmentid={p_subtreatmentid}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String InsertActiveSubTreatment(List<TreatmentItem> t_items) {
+	public String InsertActiveSubTreatment(@PathParam("p_subtreatmentid") Integer p_subtreatmentid,List<TreatmentItem> t_items) {
 		
 		ProjectManager projectManager= new ProjectManager();
 		boolean flag=false;
 		String t_tems_str = null;
 		try {
-			flag = projectManager.UpdateActiveSubTreatment(t_items);
+			flag = projectManager.UpdateActiveSubTreatment(t_items,p_subtreatmentid);
 			Gson gson = new Gson();
 			System.out.println(gson.toJson(flag));
 			t_tems_str = gson.toJson(flag);
@@ -167,11 +169,12 @@ public class JSONService {
 		return t_tems_str;
 	}	
 	
+//	+ "/providerid={providerid}&"
+//	+ "nametreatment={nametreatment : (.+)?}")
 	@POST
-	@Path("/insertsavedtreatment/providerid={providerid}&"
-			+ "nametreatment={nametreatment}")
+	@Path("/insertsavedtreatment")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String CheckNameSavedTreatment(@PathParam("providerid") Integer providerid, @PathParam("nametreatment") String nametreatment,
+	public String CheckNameSavedTreatment(@QueryParam("providerid") Integer providerid, @QueryParam("nametreatment") String nametreatment,
 			List<TreatmentItem> t_items) {	
 		ProjectManager projectManager= new ProjectManager();
 		int flag;
@@ -190,7 +193,7 @@ public class JSONService {
 	
 	@POST
 	@Path("/InsertSavedTreatment/&providerid={providerid}&"
-			+ "nametreatment={nametreatment}")
+			+ "nametreatment={nametreatment : (.+)?}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public String InsertSavedTreatment(@PathParam("providerid") Integer providerid, @PathParam("nametreatment") String nametreatment,
 			List<TreatmentItem> t_items) {	
@@ -219,14 +222,15 @@ public class JSONService {
 			List<TreatmentItem> t_items) {
 		
 		ProjectManager projectManager= new ProjectManager();
+		SubTreatment ret_sub_t=new SubTreatment();
 		int flag=0;
 		String t_tems_str = null;
 		try {
-			flag = projectManager.InsertActiveSubTreatment(activetreatmentid, providerid, patientid, 
+			ret_sub_t = projectManager.InsertActiveSubTreatment(activetreatmentid, providerid, patientid, 
 					nametreatment, namesubtreatment,t_items);
 			Gson gson = new Gson();
-			System.out.println(gson.toJson(flag));
-			t_tems_str = gson.toJson(flag);
+			System.out.println(gson.toJson(ret_sub_t));
+			t_tems_str = gson.toJson(ret_sub_t);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -465,6 +469,7 @@ public class JSONService {
 	}	
 	
 	
+
 	@POST
 	@Path("/EndTreatment/ActiveTreatmentId={ActiveTreatmentId}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -488,5 +493,32 @@ public class JSONService {
 		}	
 		
 	}	
+
+	
+	@GET
+	@Path("/CheckProviderActivationKey/{deviceId}&&{phone}&&{ActivationCode}") 
+    @Produces("application/json") 
+    public Providers CheckProviderActivationKey(@PathParam("deviceId")String deviceId,@PathParam("phone")String phone ,@PathParam("ActivationCode")int ActivationCode)throws Exception 
+	{
+		ProjectManager projectManager= new ProjectManager();
+		Providers provider = new Providers();
+		String t_tems_str = null;
+		try {
+			provider = projectManager.CheckProviderActivationKey(deviceId, phone, ActivationCode);
+//			Gson gson = new Gson();
+//			System.out.println(gson.toJson(t_items));
+//			t_tems_str = gson.toJson(t_items);
+			return provider;
+		}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throw e;
+			}
+		
+	}
+	
+	
+
 	
 }

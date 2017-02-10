@@ -12,11 +12,27 @@ import com.model.PatientsCascade;
 import com.model.ProviderProvider;
 import com.model.Providers;
 import com.model.SavedTemplate;
+import com.model.SubTreatment;
 import com.model.TreatmentItem;
 import com.model.TreatmentItemList;
 import com.model.TreatmentItemListScroll;
 
 public class ProjectManager {
+	
+
+	public Providers CheckProviderActivationKey(String deviceId , String phone , int inputCode) throws Exception {
+		Providers t_items = new Providers();
+		try {
+			    Database database= new Database();
+			    Connection connection = database.Get_Connection();
+				Project project= new Project();
+				t_items=project.CheckProviderActivationKey(connection, deviceId , phone , inputCode);
+		
+		} catch (Exception e) {
+			throw e;
+		}
+		return t_items;
+	}	
 	
 	public List<SavedTemplate> getSavedTemplate(int providerDetail) throws Exception {
 		List<SavedTemplate> t_items = null;
@@ -74,14 +90,14 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 		}
 			return flag;
 }	
-	public boolean UpdateActiveSubTreatment(List<TreatmentItem> t_items) throws Exception
+	public boolean UpdateActiveSubTreatment(List<TreatmentItem> t_items, int p_subtreatmentid) throws Exception
 {		
 		boolean flag;
 		try{
 		    Database database= new Database();
 		    Connection connection = database.Get_Connection();
 			Project project= new Project();
-			flag=project.UpdateActiveSubTreatment(connection, t_items);
+			flag=project.UpdateActiveSubTreatment(connection, t_items,p_subtreatmentid);
 		} 
 		
 		catch (Exception e) {
@@ -124,22 +140,23 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 		return flag;
 	}
 	
-	public int InsertActiveSubTreatment(int activeTreatmentID , 
+	public SubTreatment InsertActiveSubTreatment(int activeTreatmentID , 
 			int ProviderID, int PatientID, String NameTreatment, String SubNameTreatment, 
 			List<TreatmentItem> t_items) throws Exception
 {		
 		int flag=0;
+		SubTreatment ret_sub_t=new SubTreatment();
 		try{
 		    Database database= new Database();
 		    Connection connection = database.Get_Connection();
 			Project project= new Project();
-			flag=project.InsertActiveSubTreatment(connection, activeTreatmentID, ProviderID, PatientID, NameTreatment, SubNameTreatment, t_items);
+			ret_sub_t=project.InsertActiveSubTreatment(connection, activeTreatmentID, ProviderID, PatientID, NameTreatment, SubNameTreatment, t_items);
 		} 
 		
 		catch (Exception e) {
 			throw e;		
 		}
-			return flag;
+			return ret_sub_t;
 }	
 
 	public Providers InsertProvider(Providers p_provider) throws Exception {
