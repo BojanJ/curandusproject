@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 
 import com.database.Database;
 import com.database.Project;
+import com.model.ActiveTreatment;
 import com.model.Patients;
 import com.model.PatientsCascade;
 import com.model.ProviderProvider;
@@ -94,9 +95,9 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 		}
 			return flag;
 }	
-	public boolean UpdateActiveSubTreatment(List<TreatmentItem> t_items, int p_subtreatmentid) throws Exception
+	public SubTreatment UpdateActiveSubTreatment(List<TreatmentItem> t_items, int p_subtreatmentid) throws Exception
 {		
-		boolean flag;
+		SubTreatment flag=new SubTreatment();;
 		try{
 		    Database database= new Database();
 		    Connection connection = database.Get_Connection();
@@ -280,6 +281,7 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 	}
 	
 	
+
     public SavedTemplate DeleteSavedTemplate(@PathParam("savedtreatmentdetail")int savedtreatmentdetail,@PathParam("savedtreatmenttemplateid")int savedtreatmenttemplateid)throws Exception 
 	{
     	SavedTemplate t_items= new SavedTemplate();
@@ -294,4 +296,25 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 	}
 		return t_items;
 	}
+
+
+	
+	public boolean EndTreatment(int ActiveTreatmentId) throws Exception
+	{
+		boolean flag;
+		try{
+		    Database database= new Database();
+		    Connection connection = database.Get_Connection();
+			Project project= new Project();
+			flag=project.EndTreatment(connection, ActiveTreatmentId);
+		}
+		catch (Exception e) {
+			throw e;		
+		}
+		
+		return flag;
+	}
+	
+	
+
 }	
