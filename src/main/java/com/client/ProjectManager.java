@@ -4,6 +4,11 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
 import com.database.Database;
 import com.database.Project;
 import com.model.Patients;
@@ -272,5 +277,21 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 			throw e;
 		}
 		return t_items;
-	}	
+	}
+	
+	
+    public SavedTemplate DeleteSavedTemplate(@PathParam("savedtreatmentdetail")int savedtreatmentdetail,@PathParam("savedtreatmenttemplateid")int savedtreatmenttemplateid)throws Exception 
+	{
+    	SavedTemplate t_items= new SavedTemplate();
+		try {
+		    Database database= new Database();
+		    Connection connection = database.Get_Connection();
+			Project project= new Project();
+			t_items=project.DeleteSavedTemplate(connection, savedtreatmentdetail,savedtreatmenttemplateid);
+	
+	} catch (Exception e) {
+		throw e;		
+	}
+		return t_items;
+	}
 }	

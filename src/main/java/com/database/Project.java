@@ -927,5 +927,46 @@ public class Project {
 		}
 	}
 	
-	
+	public SavedTemplate DeleteSavedTemplate(Connection connection, int savedtreatmentdetail,int savedtreatmenttemplateid) throws Exception
+	{
+		SavedTemplate p_eden = new SavedTemplate();
+		PreparedStatement ps=null;
+		ps = connection.prepareStatement("CALL DeleteSavedTemplate(?,?)");
+		try
+		{
+			ps.setInt(1,savedtreatmentdetail);
+			ps.setInt(2,savedtreatmenttemplateid);
+			ResultSet rs = ps.executeQuery();
+			while(rs.next())
+			{
+				p_eden = new SavedTemplate(
+									rs.getInt(1),   
+									rs.getString(2), 
+									rs.getInt(3),   
+									rs.getDate(4),  
+									rs.getInt(5),   
+									rs.getDate(6),  
+									rs.getInt(7)    
+									);
+				
+			}
+			
+			if (p_eden == null){
+				 throw new WebApplicationException(404);
+			}
+			else
+			{
+				return p_eden;
+			}
+		}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throw e;
+			}
+		finally {
+			ps.close();
+			connection.close();
+			}
+	}
 }

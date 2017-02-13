@@ -489,7 +489,28 @@ public class JSONService {
 				e.printStackTrace();
 				throw e;
 			}
-		
+	}
+	
+	@GET
+	@Path("/DeleteSavedTemplate/{savedtreatmentdetail}&&{savedtreatmenttemplateid}") 
+    @Produces("application/json") 
+    public SavedTemplate DeleteSavedTemplate(@PathParam("savedtreatmentdetail")int savedtreatmentdetail,@PathParam("savedtreatmenttemplateid")int savedtreatmenttemplateid)throws Exception 
+	{
+		ProjectManager projectManager= new ProjectManager();
+		SavedTemplate provider = new SavedTemplate();
+		String t_tems_str = null;
+		try {
+			provider = projectManager.DeleteSavedTemplate(savedtreatmentdetail, savedtreatmenttemplateid);
+//			Gson gson = new Gson();
+//			System.out.println(gson.toJson(t_items));
+//			t_tems_str = gson.toJson(t_items);
+			return provider;
+		}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throw e;
+			}
 	}
 	
 	
