@@ -9,7 +9,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.ws.rs.WebApplicationException;
 
 import com.google.gson.Gson;
@@ -25,12 +24,6 @@ import com.model.TreatmentItemList;
 import com.model.TreatmentItemListScroll;
 import com.mysql.jdbc.Statement;
 import com.sun.jersey.api.NotFoundException;
-
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-
-import sun.misc.BASE64Decoder;
 
 public class Project {
 	
@@ -869,8 +862,6 @@ public class Project {
 				ps = connection.prepareStatement("CALL getprovidersdatabyprovider(?)");
 				ps.setInt(1,ProviderDetail);
 				ResultSet rs = ps.executeQuery();
-				
-				while(rs.next())
 				{
 					ProviderProvider p_eden = new ProviderProvider(
 							rs.getInt(1),
@@ -1062,29 +1053,7 @@ public class Project {
 				connection.setAutoCommit(false); 
 				System.out.println("REZULTAT: "+rs);
 				
-				////////////// generira slika 
-				//def sourceData = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwCAYAAAA+VemSAAAgAEl...==';
-					
-//				def sourceData = t_item.getRenderingInfo();
-//					// tokenize the data
-//					def parts = sourceData.tokenize(",");
-//					def imageString = parts[1];
-//	
-//					// create a buffered image
-//					BufferedImage image = null;
-//					byte[] imageByte;
-//	
-//					BASE64Decoder decoder = new BASE64Decoder();
-//					imageByte = decoder.decodeBuffer(imageString);
-//					ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
-//					image = ImageIO.read(bis);
-//					bis.close();
-//	
-//					// write the image to a file
-//					File outputfile = new File("image.png");
-//					ImageIO.write(image, "png", outputfile);
 				
-				/////////////
 				
 				
 				if(rs.next()){
