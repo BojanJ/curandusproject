@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.ws.rs.WebApplicationException;
 
 import com.google.gson.Gson;
@@ -24,6 +25,12 @@ import com.model.TreatmentItemList;
 import com.model.TreatmentItemListScroll;
 import com.mysql.jdbc.Statement;
 import com.sun.jersey.api.NotFoundException;
+
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+
+import sun.misc.BASE64Decoder;
 
 public class Project {
 	
@@ -1026,4 +1033,88 @@ public class Project {
 			connection.close();
 			}
 	}
+	
+	/// Insert base64 image and save locally
+	public TreatmentItem InsertBase64Image(Connection connection, TreatmentItem t_item) throws Exception
+	{	
+		PreparedStatement ps=null; 
+		TreatmentItem p_eden=new TreatmentItem();
+		int p_savedTreatmentID;	
+		try 
+		{
+			ps = connection.prepareStatement("call InsertTreatmentItemImage(?,?,?,?,?,?,?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS);
+		    
+			ps.setInt(1,t_item.getSubtreatmentid()); 
+		    ps.setString(2, t_item.getName() ); 
+		    ps.setString(3, t_item.getTypeT() ); 
+		    ps.setString(4, t_item.getRepeatT() ); 
+		    ps.setString(5, t_item.getDuration() ); 
+		    ps.setString(6, t_item.getRenderingInfo() ); 
+		    ps.setString(7, t_item.getStatus()); 
+		    ps.setDate(8, (Date) t_item.getCreated() );
+		    ps.setInt(9,t_item.getCreatedBy() ); 
+		    ps.setDate(10,(Date) t_item.getModified() ); 
+		    ps.setInt(11 ,t_item.getModifiedBy() ); 
+		    	System.out.println("OVA E SUBTREATMENT ITEM: "+t_item.getSubtreatmentid());
+		    	System.out.println("OVA E  IME: "+ t_item.getName());
+		    	System.out.println("OVA POVIK DO PROCEDURA: "+ps);
+				ResultSet rs = ps.executeQuery(); 
+				connection.setAutoCommit(false); 
+				System.out.println("REZULTAT: "+rs);
+				
+				////////////// generira slika 
+				//def sourceData = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwCAYAAAA+VemSAAAgAEl...==';
+					
+//				def sourceData = t_item.getRenderingInfo();
+//					// tokenize the data
+//					def parts = sourceData.tokenize(",");
+//					def imageString = parts[1];
+//	
+//					// create a buffered image
+//					BufferedImage image = null;
+//					byte[] imageByte;
+//	
+//					BASE64Decoder decoder = new BASE64Decoder();
+//					imageByte = decoder.decodeBuffer(imageString);
+//					ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
+//					image = ImageIO.read(bis);
+//					bis.close();
+//	
+//					// write the image to a file
+//					File outputfile = new File("image.png");
+//					ImageIO.write(image, "png", outputfile);
+				
+				/////////////
+				
+				
+				if(rs.next()){
+					 p_eden = new TreatmentItem(
+										rs.getInt(1),
+										rs.getInt(2),
+										rs.getString(3),
+										rs.getString(4),
+										rs.getString(5),
+										rs.getString(6),
+										rs.getString(7), 
+										rs.getString(8),
+										rs.getDate(9),
+										rs.getInt(10),
+										rs.getDate(11),
+										rs.getInt(12)
+										);
+					connection.commit(); 
+						
+				}
+				return p_eden;	
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+		finally {
+				ps.close();
+				connection.close();
+		}
+	}	
 }

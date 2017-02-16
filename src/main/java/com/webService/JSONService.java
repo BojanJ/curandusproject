@@ -1,6 +1,7 @@
 package com.webService;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -98,7 +99,9 @@ public class JSONService {
 			throw e;
 		}
 		
-	}	
+	}
+	
+	
 	
 	@GET
 	@Path("/treatmentitemlistscroll/treatmentitemlistid={treatmentitemlistid}&updown={updown}&range={range}")
@@ -527,9 +530,7 @@ public class JSONService {
 		String t_tems_str = null;
 		try {
 			provider = projectManager.DeleteSavedTemplate(savedtreatmentdetail, savedtreatmenttemplateid);
-//			Gson gson = new Gson();
-//			System.out.println(gson.toJson(t_items));
-//			t_tems_str = gson.toJson(t_items);
+
 			return provider;
 		}
 			catch(Exception e)
@@ -537,6 +538,31 @@ public class JSONService {
 				e.printStackTrace();
 				throw e;
 			}
+	}
+	
+	
+	@POST
+	//@Path("/inserttreatmentitemimage/{p_SubTreatmentID}&&{p_name}&&{p_type}&&{p_repeat}&&{p_duration}&&{p_renderinginfo}&&{p_status}&&{p_created}&&{p_createdBy}&&{p_modified}&&{p_modifiedBy}")
+	@Path("/inserttreatmentitemimage")
+	@Consumes(MediaType.APPLICATION_JSON) //byte[] imageCode, TreatmentItem t_item
+	@Produces("application/json") 
+	//public TreatmentItem InsertBase64Image(@QueryParam("p_SubTreatmentID") int p_SubTreatmentID, @QueryParam("p_name") String p_name , @QueryParam("p_type")String p_type, @QueryParam("p_repeat")String p_repeat, @QueryParam("p_duration")String p_duration, @QueryParam("p_renderinginfo") String p_renderinginfo,  @QueryParam("p_status")String p_status, @QueryParam("p_created")Date p_created, @QueryParam("p_createdBy")int p_createdBy, @QueryParam("p_modified")Date p_modified, @QueryParam("p_modifiedBy")int p_modifiedBy) {	
+	public TreatmentItem InsertBase64Image(	TreatmentItem tmp){
+	ProjectManager projectManager= new ProjectManager();
+		TreatmentItem t_item =null;
+		System.out.println("OVA KREIRAN ");
+		try {
+			//TreatmentItem tmp = new TreatmentItem(null,p_SubTreatmentID,p_name,p_type,p_repeat,p_duration,p_renderinginfo,p_status,p_created,p_createdBy,p_modified, p_modifiedBy);
+			
+			t_item = projectManager.InsertBase64Image(tmp);
+			Gson gson = new Gson();
+			System.out.println("OVA KREIRAN OBJEKT:"+gson.toJson(t_item));
+			
+		} catch (Exception e){
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return t_item;
 	}
 	
 	

@@ -1,6 +1,9 @@
 package com.client;
 
 import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +24,7 @@ import com.model.SubTreatment;
 import com.model.TreatmentItem;
 import com.model.TreatmentItemList;
 import com.model.TreatmentItemListScroll;
+import com.mysql.jdbc.Statement;
 
 public class ProjectManager {
 	
@@ -162,7 +166,8 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 			throw e;		
 		}
 			return ret_sub_t;
-}	
+}
+	
 
 	public Providers InsertProvider(Providers p_provider) throws Exception {
 		Providers t_items= new Providers();
@@ -315,6 +320,24 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 		return flag;
 	}
 	
+	
+	public TreatmentItem InsertBase64Image(TreatmentItem t_item) throws Exception
+	{	
+		TreatmentItem ret_sub_t=new TreatmentItem();
+		try{
+			System.out.println("OVA E SUBTREATMENT VO PR MEN ITEM: "+t_item.getSubtreatmentid());
+	    	System.out.println("OVA E VO PR MEN  IME: "+ t_item.getName());
+		    Database database= new Database();
+		    Connection connection = database.Get_Connection();
+			Project project= new Project();
+			ret_sub_t = project.InsertBase64Image( connection, t_item);
+			return ret_sub_t;
+		} 
+		
+		catch (Exception e) {
+			throw e;		
+		}
+	}
 	
 
 }	
