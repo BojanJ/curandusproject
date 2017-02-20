@@ -1,5 +1,9 @@
 package com.database;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
@@ -24,6 +28,7 @@ import com.model.TreatmentItemList;
 import com.model.TreatmentItemListScroll;
 import com.mysql.jdbc.Statement;
 import com.sun.jersey.api.NotFoundException;
+import com.sun.jersey.core.util.Base64;
 
 public class Project {
 	
@@ -1031,6 +1036,8 @@ public class Project {
 		PreparedStatement ps=null; 
 		TreatmentItem p_eden=new TreatmentItem();
 		int p_savedTreatmentID;	
+		String image="" ;
+		int randomNumber = (int) Math.floor(Math.random() * 101);
 		try 
 		{
 			ps = connection.prepareStatement("call InsertTreatmentItemImage(?,?,?,?,?,?,?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS);
@@ -1048,7 +1055,20 @@ public class Project {
 		    ps.setInt(11 ,t_item.getModifiedBy() ); 
 		    	System.out.println("OVA E SUBTREATMENT ITEM: "+t_item.getSubtreatmentid());
 		    	System.out.println("OVA E  IME: "+ t_item.getName());
-		    	System.out.println("OVA POVIK DO PROCEDURA: "+ps);
+		    	image = t_item.getRenderingInfo();
+		    	System.out.println("OVA e slikata: "+t_item.getRenderingInfo());
+		    	 try{
+		    		 Base64 decoder = new Base64(); 
+		    		 byte[] imgBytes = decoder.decode(image.substring(image.lastIndexOf(",") + 1,image.length()-1));
+		    		 System.out.println("STRINGOT : "+image.substring(image.lastIndexOf(",") + 1,image.length()-1));
+		    		 FileOutputStream osf = new FileOutputStream(new File("E:\\"+randomNumber+".png"));
+		    		 osf.write(imgBytes);
+		    		 osf.flush(); 
+		    		 System.out.println("OVA e slikata vo bajti: "+imgBytes);
+		    	    }
+		    	    catch (Exception e) {
+		    	        return null;            
+		    	    }
 				ResultSet rs = ps.executeQuery(); 
 				connection.setAutoCommit(false); 
 				System.out.println("REZULTAT: "+rs);
@@ -1064,7 +1084,8 @@ public class Project {
 										rs.getString(4),
 										rs.getString(5),
 										rs.getString(6),
-										rs.getString(7), 
+										"{\"code\":\""+randomNumber+"\"}",
+										
 										rs.getString(8),
 										rs.getDate(9),
 										rs.getInt(10),
