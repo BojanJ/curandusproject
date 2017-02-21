@@ -867,6 +867,7 @@ public class Project {
 				ps = connection.prepareStatement("CALL getprovidersdatabyprovider(?)");
 				ps.setInt(1,ProviderDetail);
 				ResultSet rs = ps.executeQuery();
+				while(rs.next())
 				{
 					ProviderProvider p_eden = new ProviderProvider(
 							rs.getInt(1),
