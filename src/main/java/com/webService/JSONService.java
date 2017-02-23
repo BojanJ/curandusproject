@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -517,6 +518,58 @@ public class JSONService {
 			}
 		
 	}
+	
+	@GET
+	@Path("/deleteProviderProvider/{ProviderDetail1}&&{ProviderDetail2}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces("application/json")
+	public String deleteProviderProvider(@PathParam("ProviderDetail1") Integer ProviderDetail1,@PathParam("ProviderDetail2") Integer ProviderDetail2) throws Exception  {	
+		ProjectManager projectManager= new ProjectManager();
+	
+		boolean flag = false;
+		String t_tems_str = null;
+		try {
+			flag = projectManager.deleteProviderProvider( ProviderDetail1, ProviderDetail2);
+			Gson gson = new Gson();
+			System.out.println(gson.toJson(flag));
+			t_tems_str = gson.toJson(flag);
+			return t_tems_str;
+		} 
+		
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}	
+		
+	}
+	
+	
+	@GET
+	@Path("/deleteProviderPatient/{ProviderDetail}&&{PatientDetail}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String deleteProviderPatient(@PathParam("ProviderDetail") Integer ProviderDetail,@PathParam("PatientDetail") Integer PatientDetail) throws Exception  {	
+		ProjectManager projectManager= new ProjectManager();
+		System.out.println("jkadfahskjdhasjkdnas");
+		boolean flag = false;
+		String t_tems_str = null;
+		try {
+			flag = projectManager.deleteProviderPatient( ProviderDetail, PatientDetail);
+			Gson gson = new Gson();
+			System.out.println(gson.toJson(flag));
+			t_tems_str = gson.toJson(flag);
+			return t_tems_str;
+		} 
+		
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}	
+		
+	}
+	
+	
 	
 	
 

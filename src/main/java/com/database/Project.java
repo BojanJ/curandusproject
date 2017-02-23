@@ -965,4 +965,82 @@ public class Project {
 	}
 	
 	
+	public boolean deleteProviderProvider(Connection connection, int ProviderDetail1, int ProviderDetail2) throws Exception
+	{	
+		PreparedStatement ps=null;
+		int p_ProviderDetail1;
+		int p_ProviderDetail2;
+		boolean flag=false;
+		try
+		{
+			ps = connection.prepareCall("call deleteProviderProvider(?,?)");
+			ps.setInt(1,ProviderDetail1);
+			ps.setInt(2,ProviderDetail2);
+		   
+
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()){
+				flag=(rs.getBoolean(1));
+			}	
+			
+			if (flag==false){
+				 throw new WebApplicationException(404);
+			}
+			else  
+			{
+			return flag;
+			}
+			}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+		finally {
+			connection.close();
+		}
+	}
+	
+	
+	public boolean deleteProviderPatient(Connection connection, int ProviderDetail, int PatientDetail) throws Exception
+	{	
+		PreparedStatement ps=null;
+		int p_ProviderDetail;
+		int p_PatientDetail;
+		boolean flag=false;
+		try
+		{
+			ps = connection.prepareCall("call deleteProviderPatient(?,?)");
+			ps.setInt(1,ProviderDetail);
+			ps.setInt(2,PatientDetail);
+		   
+
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()){
+				flag=(rs.getBoolean(1));
+			}	
+			
+			if (flag==false){
+				 throw new WebApplicationException(404);
+			}
+			else  
+			{
+			return flag;
+			}
+			}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+		finally {
+			connection.close();
+		}
+	}
+	
+	
+	
+	
+	
+	
 }
