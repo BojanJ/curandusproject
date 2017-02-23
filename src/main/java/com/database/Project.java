@@ -1061,7 +1061,7 @@ public class Project {
 		    		 Base64 decoder = new Base64(); 
 		    		 byte[] imgBytes = decoder.decode(image.substring(image.lastIndexOf(",") + 1,image.length()-1));
 		    		 System.out.println("STRINGOT : "+image.substring(image.lastIndexOf(",") + 1,image.length()-1));
-		    		 FileOutputStream osf = new FileOutputStream(new File("E:\\"+randomNumber+".png"));
+		    		 FileOutputStream osf = new FileOutputStream(new File("E:\\"+Integer.toString(randomNumber)+".png"));
 		    		 osf.write(imgBytes);
 		    		 osf.flush(); 
 		    		 System.out.println("OVA e slikata vo bajti: "+imgBytes);
@@ -1084,8 +1084,7 @@ public class Project {
 										rs.getString(4),
 										rs.getString(5),
 										rs.getString(6),
-										"{\"code\":\""+randomNumber+"\"}",
-										
+										"{\"code\":\""+randomNumber+"\"}",										
 										rs.getString(8),
 										rs.getDate(9),
 										rs.getInt(10),
