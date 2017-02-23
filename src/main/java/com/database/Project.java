@@ -1,5 +1,9 @@
 package com.database;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
@@ -24,6 +28,7 @@ import com.model.TreatmentItemList;
 import com.model.TreatmentItemListScroll;
 import com.mysql.jdbc.Statement;
 import com.sun.jersey.api.NotFoundException;
+import com.sun.jersey.core.util.Base64;
 
 public class Project {
 	
@@ -246,12 +251,17 @@ public class Project {
 		}
 	}	
 	
-	public boolean UpdateActiveSubTreatment(Connection connection, List<TreatmentItem> t_items, int p_subtreatmentid) throws Exception
+	public SubTreatment UpdateActiveSubTreatment(Connection connection, List<TreatmentItem> t_items, int p_subtreatmentid) throws Exception
 	{	
 		PreparedStatement pss=null;
 		PreparedStatement ps=null;
+		PreparedStatement pss1=null;
+		
 		System.out.println("start");
 		String listadeleteobicna="0";
+		
+		SubTreatment ret_sub=new SubTreatment();
+		
 				Gson gson = new Gson();
 			try{
 				connection.setAutoCommit(false);
@@ -272,7 +282,7 @@ public class Project {
 				{
 					System.out.println("ID "+NVL(tt.getTreatmentItemId()));
 					pss.setInt(1,NVL(tt.getTreatmentItemId()));
-					pss.setInt(2, NVL(tt.getSubtreatmentid()));
+					pss.setInt(2, NVL(p_subtreatmentid));
 					pss.setString(3, tt.getName());
 					pss.setString(4, tt.getRepeatT());
 					pss.setString(5, tt.getTypeT());
@@ -283,9 +293,20 @@ public class Project {
 				}
 				pss.executeBatch();
 				//pss.executeQuery();
-			
+				pss1 =connection.prepareStatement("call GetIds(?)",Statement.RETURN_GENERATED_KEYS);
+				pss1.setInt(1, p_subtreatmentid);
+				
+				ResultSet rs1 = pss1.executeQuery();
+				while(rs1.next())
+				{
+					ret_sub.setSubtreatmentid(rs1.getInt(1));
+					ret_sub.setActivetreatmenId(rs1.getInt(2));
+					ret_sub.setPatientId(rs1.getInt(3));
+				}				
+				
+				
 				connection.commit(); 
-				return true;
+				return ret_sub;
 		}
 		catch(Exception e)
 		{
@@ -440,7 +461,9 @@ public class Project {
 				ret_sub_t.setSubtreatmentid(rs.getInt(1));
 				
 				ret_active_treatment=rs.getInt(2);
-				ret_sub_t.setActivetreatmentid(rs.getInt(2));
+				ret_sub_t.setActivetreatmenId(rs.getInt(2));
+				
+				ret_sub_t.setPatientId(PatientID);
 
 				Gson gson = new Gson();
 
@@ -964,6 +987,127 @@ public class Project {
 		}
 	}
 	
+	public SavedTemplate DeleteSavedTemplate(Connection connection, int savedtreatmentdetail,int savedtreatmenttemplateid) throws Exception
+	{
+		SavedTemplate p_eden = new SavedTemplate();
+		PreparedStatement ps=null;
+		ps = connection.prepareStatement("CALL DeleteSavedTemplate(?,?)");
+		try
+		{
+			ps.setInt(1,savedtreatmentdetail);
+			ps.setInt(2,savedtreatmenttemplateid);
+			ResultSet rs = ps.executeQuery();
+			while(rs.next())
+			{
+				p_eden = new SavedTemplate(
+									rs.getInt(1),   
+									rs.getString(2), 
+									rs.getInt(3),   
+									rs.getDate(4),  
+									rs.getInt(5),   
+									rs.getDate(6),  
+									rs.getInt(7)    
+									);
+				
+			}
+			
+			if (p_eden == null){
+				 throw new WebApplicationException(404);
+			}
+			else
+			{
+				return p_eden;
+			}
+		}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throw e;
+			}
+		finally {
+			ps.close();
+			connection.close();
+			}
+	}
+	
+	/// Insert base64 image and save locally
+	public TreatmentItem InsertBase64Image(Connection connection, TreatmentItem t_item) throws Exception
+	{	
+		PreparedStatement ps=null; 
+		TreatmentItem p_eden=new TreatmentItem();
+		int p_savedTreatmentID;	
+		String image="" ;
+		int randomNumber = (int) Math.floor(Math.random() * 101);
+		try 
+		{
+			ps = connection.prepareStatement("call InsertTreatmentItemImage(?,?,?,?,?,?,?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS);
+		    
+			ps.setInt(1,t_item.getSubtreatmentid()); 
+		    ps.setString(2, t_item.getName() ); 
+		    ps.setString(3, t_item.getTypeT() ); 
+		    ps.setString(4, t_item.getRepeatT() ); 
+		    ps.setString(5, t_item.getDuration() ); 
+		    ps.setString(6, t_item.getRenderingInfo() ); 
+		    ps.setString(7, t_item.getStatus()); 
+		    ps.setDate(8, (Date) t_item.getCreated() );
+		    ps.setInt(9,t_item.getCreatedBy() ); 
+		    ps.setDate(10,(Date) t_item.getModified() ); 
+		    ps.setInt(11 ,t_item.getModifiedBy() ); 
+		    	System.out.println("OVA E SUBTREATMENT ITEM: "+t_item.getSubtreatmentid());
+		    	System.out.println("OVA E  IME: "+ t_item.getName());
+		    	image = t_item.getRenderingInfo();
+		    	System.out.println("OVA e slikata: "+t_item.getRenderingInfo());
+		    	 try{
+		    		 Base64 decoder = new Base64(); 
+		    		 byte[] imgBytes = decoder.decode(image.substring(image.lastIndexOf(",") + 1,image.length()-1));
+		    		 System.out.println("STRINGOT : "+image.substring(image.lastIndexOf(",") + 1,image.length()-1));
+		    		 FileOutputStream osf = new FileOutputStream(new File("E:\\"+Integer.toString(randomNumber)+".png"));
+		    		 osf.write(imgBytes);
+		    		 osf.flush(); 
+		    		 System.out.println("OVA e slikata vo bajti: "+imgBytes);
+		    	    }
+		    	    catch (Exception e) {
+		    	        return null;            
+		    	    }
+				ResultSet rs = ps.executeQuery(); 
+				connection.setAutoCommit(false); 
+				System.out.println("REZULTAT: "+rs);
+				
+				
+				
+				
+				if(rs.next()){
+					 p_eden = new TreatmentItem(
+										rs.getInt(1),
+										rs.getInt(2),
+										rs.getString(3),
+										rs.getString(4),
+										rs.getString(5),
+										rs.getString(6),
+										"{\"code\":\""+randomNumber+"\"}",										
+										rs.getString(8),
+										rs.getDate(9),
+										rs.getInt(10),
+										rs.getDate(11),
+										rs.getInt(12)
+										);
+					connection.commit(); 
+						
+				}
+				return p_eden;	
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+		finally {
+				ps.close();
+				connection.close();
+		}
+	}	
+	
+	
 	
 	public boolean deleteProviderProvider(Connection connection, int ProviderDetail1, int ProviderDetail2) throws Exception
 	{	
@@ -1037,10 +1181,6 @@ public class Project {
 			connection.close();
 		}
 	}
-	
-	
-	
-	
 	
 	
 }

@@ -1,8 +1,16 @@
 package com.client;
 
 import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 
 import com.database.Database;
 import com.database.Project;
@@ -16,6 +24,7 @@ import com.model.SubTreatment;
 import com.model.TreatmentItem;
 import com.model.TreatmentItemList;
 import com.model.TreatmentItemListScroll;
+import com.mysql.jdbc.Statement;
 
 public class ProjectManager {
 	
@@ -90,9 +99,9 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 		}
 			return flag;
 }	
-	public boolean UpdateActiveSubTreatment(List<TreatmentItem> t_items, int p_subtreatmentid) throws Exception
+	public SubTreatment UpdateActiveSubTreatment(List<TreatmentItem> t_items, int p_subtreatmentid) throws Exception
 {		
-		boolean flag;
+		SubTreatment flag=new SubTreatment();;
 		try{
 		    Database database= new Database();
 		    Connection connection = database.Get_Connection();
@@ -157,7 +166,8 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 			throw e;		
 		}
 			return ret_sub_t;
-}	
+}
+	
 
 	public Providers InsertProvider(Providers p_provider) throws Exception {
 		Providers t_items= new Providers();
@@ -277,6 +287,22 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 	
 	
 
+    public SavedTemplate DeleteSavedTemplate(@PathParam("savedtreatmentdetail")int savedtreatmentdetail,@PathParam("savedtreatmenttemplateid")int savedtreatmenttemplateid)throws Exception 
+	{
+    	SavedTemplate t_items= new SavedTemplate();
+		try {
+		    Database database= new Database();
+		    Connection connection = database.Get_Connection();
+			Project project= new Project();
+			t_items=project.DeleteSavedTemplate(connection, savedtreatmentdetail,savedtreatmenttemplateid);
+	
+	} catch (Exception e) {
+		throw e;		
+	}
+		return t_items;
+	}
+
+
 	
 	public boolean EndTreatment(int ActiveTreatmentId) throws Exception
 	{
@@ -327,4 +353,23 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 	}
 	
 	
+	public TreatmentItem InsertBase64Image(TreatmentItem t_item) throws Exception
+	{	
+		TreatmentItem ret_sub_t=new TreatmentItem();
+		try{
+			System.out.println("OVA E SUBTREATMENT VO PR MEN ITEM: "+t_item.getSubtreatmentid());
+	    	System.out.println("OVA E VO PR MEN  IME: "+ t_item.getName());
+		    Database database= new Database();
+		    Connection connection = database.Get_Connection();
+			Project project= new Project();
+			ret_sub_t = project.InsertBase64Image( connection, t_item);
+			return ret_sub_t;
+		} 
+		
+		catch (Exception e) {
+			throw e;		
+		}
+	}
+	
+
 }	

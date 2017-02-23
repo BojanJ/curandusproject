@@ -1,6 +1,7 @@
 package com.webService;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -99,7 +100,9 @@ public class JSONService {
 			throw e;
 		}
 		
-	}	
+	}
+	
+	
 	
 	@GET
 	@Path("/treatmentitemlistscroll/treatmentitemlistid={treatmentitemlistid}&updown={updown}&range={range}")
@@ -156,7 +159,7 @@ public class JSONService {
 	public String InsertActiveSubTreatment(@PathParam("p_subtreatmentid") Integer p_subtreatmentid,List<TreatmentItem> t_items) {
 		
 		ProjectManager projectManager= new ProjectManager();
-		boolean flag=false;
+		SubTreatment flag=new SubTreatment();
 		String t_tems_str = null;
 		try {
 			flag = projectManager.UpdateActiveSubTreatment(t_items,p_subtreatmentid);
@@ -516,7 +519,47 @@ public class JSONService {
 				e.printStackTrace();
 				throw e;
 			}
-		
+	}
+	
+	@GET
+	@Path("/DeleteSavedTemplate/{savedtreatmentdetail}&&{savedtreatmenttemplateid}") 
+    @Produces("application/json") 
+    public SavedTemplate DeleteSavedTemplate(@PathParam("savedtreatmentdetail")int savedtreatmentdetail,@PathParam("savedtreatmenttemplateid")int savedtreatmenttemplateid)throws Exception 
+	{
+		ProjectManager projectManager= new ProjectManager();
+		SavedTemplate provider = new SavedTemplate();
+		String t_tems_str = null;
+		try {
+			provider = projectManager.DeleteSavedTemplate(savedtreatmentdetail, savedtreatmenttemplateid);
+
+			return provider;
+		}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throw e;
+			}
+	}
+	
+	
+	@POST
+	@Path("/inserttreatmentitemimage")
+	@Consumes(MediaType.APPLICATION_JSON) //byte[] imageCode, TreatmentItem t_item
+	@Produces("application/json") 
+	public TreatmentItem InsertBase64Image(	TreatmentItem tmp){
+	ProjectManager projectManager= new ProjectManager();
+		TreatmentItem t_item =null;
+		System.out.println("OVA KREIRAN ");
+		try {
+			t_item = projectManager.InsertBase64Image(tmp);
+			Gson gson = new Gson();
+			System.out.println("OVA KREIRAN OBJEKT:"+gson.toJson(t_item));
+			
+		} catch (Exception e){
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return t_item;
 	}
 	
 	@GET
