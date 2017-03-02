@@ -15,6 +15,9 @@ import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
 
+import org.apache.commons.codec.binary.Base64;
+import org.codehaus.jettison.json.JSONObject;
+
 import com.google.gson.Gson;
 import com.model.ActiveTreatment;
 import com.model.Patients;
@@ -28,7 +31,13 @@ import com.model.TreatmentItemList;
 import com.model.TreatmentItemListScroll;
 import com.mysql.jdbc.Statement;
 import com.sun.jersey.api.NotFoundException;
-import com.sun.jersey.core.util.Base64;
+
+import com.twilio.sdk.TwilioRestClient;
+import com.twilio.sdk.TwilioRestException;
+import com.twilio.sdk.resource.factory.SmsFactory;
+import com.twilio.sdk.resource.instance.Account;
+ 
+import java.util.HashMap;
 
 public class Project {
 	
@@ -42,6 +51,27 @@ public class Project {
 			return a;
 		}
 	}
+	
+//	public boolean SendSMS()  throws Exception{
+//		
+//		TwilioRestClient client = new TwilioRestClient("YOUR_TWILIO_ACCOUNT_SID", "YOUR_TWILIO_AUTH_TOKEN");
+//		 
+//        Account account = client.getAccount();
+// 
+//        SmsFactory factory = account.getSmsFactory();
+// 
+//        HashMap<String, String> message = new HashMap<>();
+// 
+//        message.put("To", "YOUR_PHONE_NUMBER");
+//        message.put("From", "YOUR_TWILIO_PHONE_NUMBER");
+//        message.put("Body", "Ahoy from Twilio!");
+// 
+//        factory.create(message);		
+//		
+//		return true;
+//	}
+	
+	
 	public List<SavedTemplate> getSavedTemplate(Connection connection, int ProviderDetail) throws Exception
 	{
 		List<SavedTemplate> t_items = new ArrayList<SavedTemplate>();
@@ -1033,13 +1063,16 @@ public class Project {
 	}
 	
 	/// Insert base64 image and save locally
-	public TreatmentItem InsertBase64Image(Connection connection, TreatmentItem t_item) throws Exception
+	public int InsertBase64Image(Connection connection, TreatmentItem t_item) throws Exception
 	{	
+		System.out.println("Vlezeeee");
 		PreparedStatement ps=null; 
 		TreatmentItem p_eden=new TreatmentItem();
 		int p_savedTreatmentID;	
 		String image="" ;
+		JSONObject json;
 		int randomNumber = (int) Math.floor(Math.random() * 101);
+		System.out.println("Vlezeeee"+randomNumber);
 		try 
 		{
 			ps = connection.prepareStatement("call InsertTreatmentItemImage(?,?,?,?,?,?,?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS);
@@ -1055,48 +1088,61 @@ public class Project {
 		    ps.setInt(9,t_item.getCreatedBy() ); 
 		    ps.setDate(10,(Date) t_item.getModified() ); 
 		    ps.setInt(11 ,t_item.getModifiedBy() ); 
-		    	System.out.println("OVA E SUBTREATMENT ITEM: "+t_item.getSubtreatmentid());
-		    	System.out.println("OVA E  IME: "+ t_item.getName());
+		    	//System.out.println("OVA E SUBTREATMENT ITEM: "+t_item.getSubtreatmentid());
+		    	//System.out.println("OVA E  IME: "+ t_item.getName());
 		    	image = t_item.getRenderingInfo();
-		    	System.out.println("OVA e slikata: "+t_item.getRenderingInfo());
-		    	 try{
-		    		 Base64 decoder = new Base64(); 
-		    		 byte[] imgBytes = decoder.decode(image.substring(image.lastIndexOf(",") + 1,image.length()-1));
-		    		 System.out.println("STRINGOT : "+image.substring(image.lastIndexOf(",") + 1,image.length()-1));
-		    		 FileOutputStream osf = new FileOutputStream(new File("E:\\"+Integer.toString(randomNumber)+".png"));
-		    		 osf.write(imgBytes);
-		    		 osf.flush(); 
-		    		 System.out.println("OVA e slikata vo bajti: "+imgBytes);
-		    	    }
-		    	    catch (Exception e) {
-		    	        return null;            
+		    	//System.out.println("OVA e slikata: "+t_item.getRenderingInfo());
+		    	
+		    	System.out.println("OVA pred gson ");
+				Gson gson = new Gson();
+				json = new JSONObject(t_item.getRenderingInfo());
+				image = json.getString("base64");
+				System.out.println("Prvi 50 "+image.substring(0, 50));
+				System.out.println("Posledni 50 "+image.substring(image.length()-50, image.length()-1));
+		    	 try{ 
+		    		 Base64 decoder = new Base64();
+		    		 byte[] imgBytes = Base64.decodeBase64(image);
+		    				 
+		    		// decoder.decode(image); //.substring(image.lastIndexOf(",") + 1,image.length()-1));
+		    		 System.out.println("OVA e img bytes: "+imgBytes);
+		    		 //System.out.println("STRINGOT : "+image.substring(image.lastIndexOf(",") + 1,image.length()-1));
+		    		// FileOutputStream osf = new FileOutputStream(new File("\\\\192.168.1.165\\Razmena\\curandusImages\\"+Integer.toString(randomNumber)+".jpg"));
+			    //	FileOutputStream osf = new FileOutputStream(new File("http"//89.205.28.221/curandusImages/"+Integer.toString(randomNumber)+".jpg"));
+			    	FileOutputStream osf = new FileOutputStream(new File("\\\\192.168.1.110\\curandusImages\\"+Integer.toString(randomNumber)+".jpg"));
+
+		    		 osf.write(imgBytes); 
+		    		// osf.flush(); 
+		    		 osf.close(); 
+		    		 System.out.println("OVA e slikata vo bajti: "+imgBytes); 
+		    	    } 
+		    	    catch (Exception e) { 
+						e.printStackTrace();
+						throw e;          
 		    	    }
 				ResultSet rs = ps.executeQuery(); 
 				connection.setAutoCommit(false); 
-				System.out.println("REZULTAT: "+rs);
 				
-				
-				
-				
-				if(rs.next()){
-					 p_eden = new TreatmentItem(
-										rs.getInt(1),
-										rs.getInt(2),
-										rs.getString(3),
-										rs.getString(4),
-										rs.getString(5),
-										rs.getString(6),
-										"{\"code\":\""+randomNumber+"\"}",										
-										rs.getString(8),
-										rs.getDate(9),
-										rs.getInt(10),
-										rs.getDate(11),
-										rs.getInt(12)
-										);
-					connection.commit(); 
-						
-				}
-				return p_eden;	
+				//System.out.println("REZULTAT: "+rs);				
+//				if(rs.next()){
+//					 p_eden = new TreatmentItem(
+//										rs.getInt(1),
+//										rs.getInt(2),
+//										rs.getString(3),
+//										rs.getString(4),
+//										rs.getString(5),
+//										rs.getString(6),
+//										"{\"code\":\""+randomNumber+"\"}",										
+//										rs.getString(8),
+//										rs.getDate(9),
+//										rs.getInt(10),
+//										rs.getDate(11),
+//										rs.getInt(12)
+//										);
+//					connection.commit(); 
+//						
+//				}
+				 //System.out.println("OVA e tretment item: "+randomNumber); 
+				return randomNumber;	
 		}
 		catch(Exception e)
 		{

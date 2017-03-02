@@ -543,23 +543,22 @@ public class JSONService {
 	
 	
 	@POST
-	@Path("/inserttreatmentitemimage")
+	@Path("/inserttreatmentitemimage") 
 	@Consumes(MediaType.APPLICATION_JSON) //byte[] imageCode, TreatmentItem t_item
 	@Produces("application/json") 
-	public TreatmentItem InsertBase64Image(	TreatmentItem tmp){
-	ProjectManager projectManager= new ProjectManager();
-		TreatmentItem t_item =null;
-		System.out.println("OVA KREIRAN ");
-		try {
-			t_item = projectManager.InsertBase64Image(tmp);
-			Gson gson = new Gson();
-			System.out.println("OVA KREIRAN OBJEKT:"+gson.toJson(t_item));
-			
-		} catch (Exception e){
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return t_item;
+	public int InsertBase64Image(	TreatmentItem tmp){ 
+	ProjectManager projectManager= new ProjectManager(); 
+		int t_item =0; 
+		//System.out.println("OVA KREIRAN"); 
+		try { 
+			t_item = projectManager.InsertBase64Image(tmp); 
+			Gson gson = new Gson(); 
+			//System.out.println("OVA KREIRAN OBJEKT:" + gson.toJson(t_item)); 
+		} catch (Exception e){ 
+			// TODO Auto-generated catch block 
+			e.printStackTrace(); 
+		} 
+		return t_item; 
 	}
 	
 	@GET

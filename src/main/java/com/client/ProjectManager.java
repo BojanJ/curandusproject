@@ -353,12 +353,12 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 	}
 	
 	
-	public TreatmentItem InsertBase64Image(TreatmentItem t_item) throws Exception
+	public int InsertBase64Image(TreatmentItem t_item) throws Exception
 	{	
-		TreatmentItem ret_sub_t=new TreatmentItem();
+		int ret_sub_t;
 		try{
-			System.out.println("OVA E SUBTREATMENT VO PR MEN ITEM: "+t_item.getSubtreatmentid());
-	    	System.out.println("OVA E VO PR MEN  IME: "+ t_item.getName());
+			//System.out.println("OVA E SUBTREATMENT VO PR MEN ITEM: "+t_item.getSubtreatmentid());
+	    	//System.out.println("OVA E VO PR MEN  IME: "+ t_item.getName());
 		    Database database= new Database();
 		    Connection connection = database.Get_Connection();
 			Project project= new Project();
