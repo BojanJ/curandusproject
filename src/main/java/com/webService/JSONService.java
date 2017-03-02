@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -542,24 +543,75 @@ public class JSONService {
 	
 	
 	@POST
-	@Path("/inserttreatmentitemimage")
+	@Path("/inserttreatmentitemimage") 
 	@Consumes(MediaType.APPLICATION_JSON) //byte[] imageCode, TreatmentItem t_item
 	@Produces("application/json") 
-	public TreatmentItem InsertBase64Image(	TreatmentItem tmp){
-	ProjectManager projectManager= new ProjectManager();
-		TreatmentItem t_item =null;
-		System.out.println("OVA KREIRAN ");
-		try {
-			t_item = projectManager.InsertBase64Image(tmp);
-			Gson gson = new Gson();
-			System.out.println("OVA KREIRAN OBJEKT:"+gson.toJson(t_item));
-			
-		} catch (Exception e){
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return t_item;
+	public int InsertBase64Image(	TreatmentItem tmp){ 
+	ProjectManager projectManager= new ProjectManager(); 
+		int t_item =0; 
+		//System.out.println("OVA KREIRAN"); 
+		try { 
+			t_item = projectManager.InsertBase64Image(tmp); 
+			Gson gson = new Gson(); 
+			//System.out.println("OVA KREIRAN OBJEKT:" + gson.toJson(t_item)); 
+		} catch (Exception e){ 
+			// TODO Auto-generated catch block 
+			e.printStackTrace(); 
+		} 
+		return t_item; 
 	}
+	
+	@GET
+	@Path("/deleteProviderProvider/{ProviderDetail1}&&{ProviderDetail2}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces("application/json")
+	public String deleteProviderProvider(@PathParam("ProviderDetail1") Integer ProviderDetail1,@PathParam("ProviderDetail2") Integer ProviderDetail2) throws Exception  {	
+		ProjectManager projectManager= new ProjectManager();
+	
+		boolean flag = false;
+		String t_tems_str = null;
+		try {
+			flag = projectManager.deleteProviderProvider( ProviderDetail1, ProviderDetail2);
+			Gson gson = new Gson();
+			System.out.println(gson.toJson(flag));
+			t_tems_str = gson.toJson(flag);
+			return t_tems_str;
+		} 
+		
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}	
+		
+	}
+	
+	
+	@GET
+	@Path("/deleteProviderPatient/{ProviderDetail}&&{PatientDetail}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String deleteProviderPatient(@PathParam("ProviderDetail") Integer ProviderDetail,@PathParam("PatientDetail") Integer PatientDetail) throws Exception  {	
+		ProjectManager projectManager= new ProjectManager();
+		System.out.println("jkadfahskjdhasjkdnas");
+		boolean flag = false;
+		String t_tems_str = null;
+		try {
+			flag = projectManager.deleteProviderPatient( ProviderDetail, PatientDetail);
+			Gson gson = new Gson();
+			System.out.println(gson.toJson(flag));
+			t_tems_str = gson.toJson(flag);
+			return t_tems_str;
+		} 
+		
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}	
+		
+	}
+	
+	
 	
 	
 

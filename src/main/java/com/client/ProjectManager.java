@@ -320,13 +320,45 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 		return flag;
 	}
 	
-	
-	public TreatmentItem InsertBase64Image(TreatmentItem t_item) throws Exception
-	{	
-		TreatmentItem ret_sub_t=new TreatmentItem();
+	public boolean deleteProviderProvider( int ProviderDetail1, int ProviderDetail2) throws Exception
+	{
+		boolean flag;
 		try{
-			System.out.println("OVA E SUBTREATMENT VO PR MEN ITEM: "+t_item.getSubtreatmentid());
-	    	System.out.println("OVA E VO PR MEN  IME: "+ t_item.getName());
+		    Database database= new Database();
+		    Connection connection = database.Get_Connection();
+			Project project= new Project();
+			flag=project.deleteProviderProvider(connection, ProviderDetail1, ProviderDetail2);
+		}
+		catch (Exception e) {
+			throw e;		
+		}
+		
+		return flag;
+	}
+	
+	public boolean deleteProviderPatient( int ProviderDetail, int PatientDetail) throws Exception
+	{
+		boolean flag;
+		try{
+		    Database database= new Database();
+		    Connection connection = database.Get_Connection();
+			Project project= new Project();
+			flag=project.deleteProviderPatient(connection, ProviderDetail, PatientDetail);
+		}
+		catch (Exception e) {
+			throw e;		
+		}
+		
+		return flag;
+	}
+	
+	
+	public int InsertBase64Image(TreatmentItem t_item) throws Exception
+	{	
+		int ret_sub_t;
+		try{
+			//System.out.println("OVA E SUBTREATMENT VO PR MEN ITEM: "+t_item.getSubtreatmentid());
+	    	//System.out.println("OVA E VO PR MEN  IME: "+ t_item.getName());
 		    Database database= new Database();
 		    Connection connection = database.Get_Connection();
 			Project project= new Project();
