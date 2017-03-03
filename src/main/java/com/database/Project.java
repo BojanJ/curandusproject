@@ -38,13 +38,6 @@ import com.twilio.type.PhoneNumber;
 
 import java.net.URISyntaxException;
 
-//import com.twilio.sdk.TwilioRestClient;
-//import com.twilio.sdk.TwilioRestException;
-//import com.twilio.sdk.resource.factory.SmsFactory;
-//import com.twilio.sdk.resource.instance.Account;
-// 
-//import java.util.HashMap;
-
 public class Project {
 	
 	public Integer NVL(Integer a){
@@ -74,7 +67,7 @@ public class Project {
         
         return true;
 	}
-	
+
 //	public boolean SendSMS()  throws Exception{
 //		
 //		TwilioRestClient client = new TwilioRestClient("YOUR_TWILIO_ACCOUNT_SID", "YOUR_TWILIO_AUTH_TOKEN");
