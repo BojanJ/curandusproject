@@ -32,6 +32,12 @@ import com.model.TreatmentItemListScroll;
 import com.mysql.jdbc.Statement;
 import com.sun.jersey.api.NotFoundException;
 
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
+
+import java.net.URISyntaxException;
+
 //import com.twilio.sdk.TwilioRestClient;
 //import com.twilio.sdk.TwilioRestException;
 //import com.twilio.sdk.resource.factory.SmsFactory;
@@ -50,6 +56,23 @@ public class Project {
 		{
 			return a;
 		}
+	}
+	
+	public boolean SendSMS()  throws URISyntaxException {
+		
+       // Twilio.init("AC5dc88a4ccce105c4e7a0335d3d95b6d8", "eeb9e4447f5ec91bdd60cf479b780633");
+        
+        Twilio.init("AC389ed5b9f9f774b7383cbf88af065f46", "0559b9f3af2fa00c93cd25285deb036b");
+
+        Message message = Message
+                .creator(new PhoneNumber("+38976437168"),  // to
+                         new PhoneNumber("+38971248256"),  // from
+                         "Where's Wallace?")
+                .create();
+        
+        System.out.println(message.getSid());
+        
+        return true;
 	}
 	
 //	public boolean SendSMS()  throws Exception{
