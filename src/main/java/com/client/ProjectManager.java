@@ -28,6 +28,18 @@ import com.mysql.jdbc.Statement;
 
 public class ProjectManager {
 	
+	
+	public boolean SendSMS(String To, String Body)  throws Exception {
+		boolean flag = false;
+		try {
+				Project project= new Project();
+				flag=project.SendSMS(To, Body);
+		
+		} catch (Exception e) {
+			throw e;
+		}
+		return flag;
+	}		
 
 	public Providers CheckProviderActivationKey(String deviceId , String phone , int inputCode) throws Exception {
 		Providers t_items = new Providers();
@@ -196,13 +208,14 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 		return t_items;
 	}
 	
-	public boolean AddContactPatient(Integer providerid, String telephoneNumber, String firstName, String lastName) throws Exception {
+	public boolean AddContactPatient(Integer providerid, String telephoneNumber, String firstName, 
+			String lastName, String ChatId, String RoomId) throws Exception {
 		boolean flag;
 		try {
 		    Database database= new Database();
 		    Connection connection = database.Get_Connection();
 			Project project= new Project();
-			flag=project.AddContactPatient(connection, providerid, telephoneNumber, firstName, lastName);
+			flag=project.AddContactPatient(connection, providerid, telephoneNumber, firstName, lastName, ChatId, RoomId);
 	
 	} catch (Exception e) {
 		throw e;
@@ -210,13 +223,14 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 	return flag;
 	}	
 	
-	public boolean AddContactDoctor(Integer providerid, String telephoneNumber, String firstName, String lastName) throws Exception {
+	public boolean AddContactDoctor(Integer providerid, String telephoneNumber, String firstName, 
+			String lastName, String ChatId, String RoomId) throws Exception {
 		boolean flag;
 		try {
 		    Database database= new Database();
 		    Connection connection = database.Get_Connection();
 			Project project= new Project();
-			flag=project.AddContactDoctor(connection, providerid, telephoneNumber, firstName, lastName);
+			flag=project.AddContactDoctor(connection, providerid, telephoneNumber, firstName, lastName,ChatId, RoomId);
 	
 	} catch (Exception e) {
 		throw e;
@@ -371,5 +385,20 @@ public boolean UpdateSavedTreatment(List<TreatmentItem> t_items, int p_savedtrea
 		}
 	}
 	
+	public void updateProviderImageUrl(int providerId, String imageUrl ) throws Exception
+	 { 
+	  int ret_sub_t;
+	  try{
+	      Database database= new Database();
+	      Connection connection = database.Get_Connection();
+	   Project project= new Project();
+	   project.updateProviderImageUrl( connection, providerId, imageUrl);
+	  
+	  } 
+	  
+	  catch (Exception e) {
+	   throw e;  
+	  }
+	 }	
 
 }	

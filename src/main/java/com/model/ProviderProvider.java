@@ -13,11 +13,15 @@ public class ProviderProvider {
 	private Integer CreatedBy;
 	private Date Modified;
 	private Integer ModifiedBy;
+	private String ChatId;
+	private String RoomId;
+	private Integer status;
 	
 	public  ProviderProvider() {}
 
 	public ProviderProvider(Integer providerProviderId, Integer providerDetail1, Integer providerDetail2l,
-			String firstName, String lastName, Date created, Integer createdBy, Date modified, Integer modifiedBy) {
+			String firstName, String lastName, Date created, Integer createdBy, Date modified, Integer modifiedBy,
+			String chatId, String roomId, Integer status) {
 		super();
 		ProviderProviderId = providerProviderId;
 		ProviderDetail1 = providerDetail1;
@@ -28,6 +32,9 @@ public class ProviderProvider {
 		CreatedBy = createdBy;
 		Modified = modified;
 		ModifiedBy = modifiedBy;
+		ChatId = chatId;
+		RoomId = roomId;
+		this.status = status;
 	}
 
 	public Integer getProviderProviderId() {
@@ -101,6 +108,29 @@ public class ProviderProvider {
 	public void setModifiedBy(Integer modifiedBy) {
 		ModifiedBy = modifiedBy;
 	}
-	
-	
+
+	public String getChatId() {
+		return ChatId;
+	}
+
+	public void setChatId(String chatId) {
+		ChatId = chatId;
+	}
+
+	public String getRoomId() {
+		return RoomId;
+	}
+
+	public void setRoomId(String roomId) {
+		RoomId = roomId;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
 }

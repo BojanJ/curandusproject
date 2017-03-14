@@ -31,12 +31,10 @@ import com.model.TreatmentItemList;
 import com.model.TreatmentItemListScroll;
 import com.mysql.jdbc.Statement;
 import com.sun.jersey.api.NotFoundException;
-
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 
-import java.net.URISyntaxException;
 
 public class Project {
 	
@@ -51,23 +49,28 @@ public class Project {
 		}
 	}
 	
-	public boolean SendSMS()  throws URISyntaxException {
+	public boolean SendSMS(String To, String Body) {
 		
-       // Twilio.init("AC5dc88a4ccce105c4e7a0335d3d95b6d8", "eeb9e4447f5ec91bdd60cf479b780633");
-        
-        Twilio.init("AC389ed5b9f9f774b7383cbf88af065f46", "0559b9f3af2fa00c93cd25285deb036b");
+        boolean flag=false;
+		try {
+			 Twilio.init("AC3cdf4cf57d4c7d9b1e99fe5b5317af5c", "fb8e434eff426f4807559adfe04b9542");
 
-        Message message = Message
-                .creator(new PhoneNumber("+38976437168"),  // to
-                         new PhoneNumber("+38971248256"),  // from
-                         "Where's Wallace?")
-                .create();
-        
-        System.out.println(message.getSid());
-        
-        return true;
+	    Message message = Message.creator(new PhoneNumber(To),
+	        new PhoneNumber("+15043157825"), 
+	        Body).create();
+	   
+	    flag=true;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+	finally {
+			return flag;
+		}
 	}
-
+	
 //	public boolean SendSMS()  throws Exception{
 //		
 //		TwilioRestClient client = new TwilioRestClient("YOUR_TWILIO_ACCOUNT_SID", "YOUR_TWILIO_AUTH_TOKEN");
@@ -248,6 +251,14 @@ public class Project {
 		System.out.println("start");
 		List<String> listaDelete=new ArrayList<String>();
 		String listadeleteobicna="0";
+		
+		List<TreatmentItem> sendTItems=new ArrayList<TreatmentItem>();
+		String render="";
+		String pateka="";
+		String pateka_send="";
+		String Ime_fajl="";
+		String comment="";
+		boolean flag_insert=true;
 				Gson gson = new Gson();
 			try{
 				connection.setAutoCommit(false);
@@ -263,8 +274,61 @@ public class Project {
 				System.out.println(listadeleteobicna);
 				ps.executeQuery();
 				
+				for (TreatmentItem t_item : t_items ){
+					flag_insert=true;
+					if (t_item.getName().equalsIgnoreCase("7")){
+						   String image="" ;
+						   Ime_fajl="";
+						   comment="";
+						   JSONObject json;
+						   Date d = new Date(System.currentTimeMillis()+5*60*1000);
+						   System.out.println("Ova e format na datum "+System.currentTimeMillis()+5*60*1000);
+						   try 
+						   {
+							  render="";
+						      json = new JSONObject(t_item.getRenderingInfo()); 
+						      flag_insert=json.getBoolean("comparisionflag"); 
+							  if (flag_insert==true) {
+							      image = json.getString("comparisionbase64"); 
+							      comment = json.getString("comparisionquestion");
+							      pateka=json.getString("pateka"); 
+							     								  
+								   int randomNumber = (int) Math.floor(Math.random() * 1000000);
+								   Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+								   Ime_fajl=randomNumber+timestamp.toString().replace(":", "").replace("-", "").replace(".", "").replace(" ", "");								  
+							      Base64 decoder = new Base64(); 
+							      byte[] imgBytes = Base64.decodeBase64(image);         
+							      FileOutputStream osf = new FileOutputStream(new File("\\\\192.168.1.110\\curandusImages\\"+Ime_fajl+".jpg"));
+							      osf.write(imgBytes); 
+							      osf.close();  
+							      if (pateka=="http://89.205.28.221"){
+							    	  pateka_send="\"http:"+"/"+"/"+"89.205.28.221"+"/"+"curandusImages"+"/"+Ime_fajl+".jpg"+"\"";
+							      }
+							      else
+							      {
+							    	 pateka_send="\"http:"+"/"+"/"+"192.168.1.110"+":"+"8080"+"/"+"curandusImages"+"/"+Ime_fajl+".jpg"+"\"" ;
+							      }
+							      System.out.println("pateka send: "+pateka_send);
+							      render="{comparisionurl:"+pateka_send+",comparisionflag:false, comparisionquestion:"+comment+"}";
+							      System.out.println("RENDER: "+render);
+							      //render="{comparisionurl:"+randomNumber+".jpg,comparisionflag:false}";
+							      json = new JSONObject(render);
+							      System.out.println("json: "+json);
+							      
+							      t_item.setRenderingInfo(json.toString());
+							   }
+						   }
+						   catch(Exception e)
+						   {
+						    e.printStackTrace();
+						    throw e;
+						   }
+					}
+					sendTItems.add(t_item);
+				}
+				
 				pss =connection.prepareStatement("call InsertUpdateSavedTreatmentItem(?,?,?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS);
-				for(TreatmentItem tt:t_items)
+				for(TreatmentItem tt:sendTItems)
 				{
 					//lista.add(tt.getTreatmentItemId());
 					pss.setInt(1,NVL(tt.getTreatmentItemId()));
@@ -305,6 +369,14 @@ public class Project {
 		
 		System.out.println("start");
 		String listadeleteobicna="0";
+		List<TreatmentItem> sendTItems=new ArrayList<TreatmentItem>();
+		String render="";
+		String pateka="";
+		String pateka_send="";
+		boolean flag_insert=true;
+		String Ime_fajl="";
+		String comment="";
+				
 		
 		SubTreatment ret_sub=new SubTreatment();
 		
@@ -320,11 +392,62 @@ public class Project {
 				ps =connection.prepareStatement("call RemoveTreatmentItem(?,?)",Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, listadeleteobicna);
 				ps.setInt(2, NVL(p_subtreatmentid));
-				ps.executeQuery();				
+				ps.executeQuery();	
 				
-				
+				for (TreatmentItem t_item : t_items ){
+					flag_insert=true;
+					if (t_item.getName().equalsIgnoreCase("7")){
+						   String image="" ;
+						   Ime_fajl="";
+						   comment="";
+						   JSONObject json;
+						   Date d = new Date(System.currentTimeMillis()+5*60*1000);
+						   System.out.println("Ova e format na datum "+System.currentTimeMillis()+5*60*1000);
+						   try 
+						   {
+							  render="";
+						      json = new JSONObject(t_item.getRenderingInfo()); 
+
+						      flag_insert=json.getBoolean("comparisionflag"); 
+							  if (flag_insert==true) {
+							      image = json.getString("comparisionbase64"); 
+							      comment = json.getString("comparisionquestion");
+							      pateka=json.getString("pateka"); 								  
+								   int randomNumber = (int) Math.floor(Math.random() * 1000000);
+								   Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+								   Ime_fajl=randomNumber+timestamp.toString().replace(":", "").replace("-", "").replace(".", "").replace(" ", "");								  
+							      Base64 decoder = new Base64(); 
+							      byte[] imgBytes = Base64.decodeBase64(image);         
+							      FileOutputStream osf = new FileOutputStream(new File("\\\\192.168.1.110\\curandusImages\\"+Ime_fajl+".jpg"));
+							      osf.write(imgBytes); 
+							      osf.close();  
+							      if (pateka=="http://89.205.28.221"){
+							    	  pateka_send="\"http:"+"/"+"/"+"89.205.28.221"+"/"+"curandusImages"+"/"+Ime_fajl+".jpg"+"\"";
+							      }
+							      else
+							      {
+							    	 pateka_send="\"http:"+"/"+"/"+"192.168.1.110"+":"+"8080"+"/"+"curandusImages"+"/"+Ime_fajl+".jpg"+"\"" ;
+							      }
+							      System.out.println("pateka send: "+pateka_send);
+							      render="{comparisionurl:"+pateka_send+",comparisionflag:false, comparisionquestion:"+comment+"}";
+							      System.out.println("RENDER: "+render);
+							      //render="{comparisionurl:"+randomNumber+".jpg,comparisionflag:false}";
+							      json = new JSONObject(render);
+							      System.out.println("json: "+json);
+							      
+							      t_item.setRenderingInfo(json.toString());
+							   }
+						   }
+						   catch(Exception e)
+						   {
+						    e.printStackTrace();
+						    throw e;
+						   }
+					}
+					sendTItems.add(t_item);
+				}
 				pss =connection.prepareStatement("call InsertUpdateTreatmentItem(?,?,?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS);
-				for(TreatmentItem tt:t_items)
+				for(TreatmentItem tt:sendTItems)
 				{
 					System.out.println("ID "+NVL(tt.getTreatmentItemId()));
 					pss.setInt(1,NVL(tt.getTreatmentItemId()));
@@ -371,8 +494,17 @@ public class Project {
 	{	
 		PreparedStatement ps=null;
 		PreparedStatement pss=null;
+		
 		int flag=0;
 		int p_savedTreatmentID;	
+		List<TreatmentItem> sendTItems=new ArrayList<TreatmentItem>();
+		String render="";
+		String pateka="";
+		String pateka_send="";
+		boolean flag_insert=true;
+		String Ime_fajl="";
+		String comment="";
+		
 		try
 		{
 		    ps =connection.prepareStatement("call CHECK_NAME_SAVE_TREATMENT(?,?)", Statement.RETURN_GENERATED_KEYS);
@@ -395,9 +527,62 @@ public class Project {
 					
 					if (rss.next()){
 						p_savedTreatmentID=rss.getInt(1);
+						
+						for (TreatmentItem t_item : t_items ){
+							flag_insert=true;
+							if (t_item.getName().equalsIgnoreCase("7")){
+								   String image="" ;
+								   Ime_fajl="";
+								   comment="";
+								   JSONObject json;
+								   Date d = new Date(System.currentTimeMillis()+5*60*1000);
+								   System.out.println("Ova e format na datum "+System.currentTimeMillis()+5*60*1000);
+								   try 
+								   {
+									  render="";
+								      json = new JSONObject(t_item.getRenderingInfo()); 
 
+								      flag_insert=json.getBoolean("comparisionflag"); 
+									  if (flag_insert==true) {
+									      image = json.getString("comparisionbase64"); 
+									      comment = json.getString("comparisionquestion");
+									      pateka=json.getString("pateka"); 										  
+										   int randomNumber = (int) Math.floor(Math.random() * 1000000);
+										   Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+										   Ime_fajl=ProviderID+randomNumber+timestamp.toString().replace(":", "").replace("-", "").replace(".", "").replace(" ", "");								  
+									      Base64 decoder = new Base64(); 
+									      byte[] imgBytes = Base64.decodeBase64(image);         
+									      FileOutputStream osf = new FileOutputStream(new File("\\\\192.168.1.110\\curandusImages\\"+Ime_fajl+".jpg"));
+									      osf.write(imgBytes); 
+									      osf.close();  
+									      if (pateka=="http://89.205.28.221"){
+									    	  pateka_send="\"http:"+"/"+"/"+"89.205.28.221"+"/"+"curandusImages"+"/"+Ime_fajl+".jpg"+"\"";
+									      }
+									      else
+									      {
+									    	 pateka_send="\"http:"+"/"+"/"+"192.168.1.110"+":"+"8080"+"/"+"curandusImages"+"/"+Ime_fajl+".jpg"+"\"" ;
+									      }
+									      System.out.println("pateka send: "+pateka_send);
+									      render="{comparisionurl:"+pateka_send+",comparisionflag:false, comparisionquestion:"+comment+"}";
+									      System.out.println("RENDER: "+render);
+									      //render="{comparisionurl:"+randomNumber+".jpg,comparisionflag:false}";
+									      json = new JSONObject(render);
+									      System.out.println("json: "+json);
+									      
+									      t_item.setRenderingInfo(json.toString());
+									   }
+								   }
+								   catch(Exception e)
+								   {
+								    e.printStackTrace();
+								    throw e;
+								   }
+							}
+							sendTItems.add(t_item);
+						}
+						
 						pss =connection.prepareStatement("call InsertUpdateSavedTreatmentItem(?,?,?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS);
-						for(TreatmentItem tt:t_items)
+						for(TreatmentItem tt:sendTItems)
 						{
 							pss.setInt(1, 0);
 							pss.setInt(2, p_savedTreatmentID);
@@ -489,6 +674,13 @@ public class Project {
 		SubTreatment ret_sub_t=new SubTreatment();
 		int p_subTreatmentID;
 		int ret_active_treatment=0;
+		List<TreatmentItem> sendTItems=new ArrayList<TreatmentItem>();
+		String render="";
+		String pateka="";
+		String pateka_send="";
+		boolean flag_insert=true;
+		String Ime_fajl="";
+		String comment="";		
 	
 		try
 		{
@@ -512,10 +704,62 @@ public class Project {
 				ret_sub_t.setPatientId(PatientID);
 
 				Gson gson = new Gson();
+				for (TreatmentItem t_item : t_items ){
+					flag_insert=true;
+					if (t_item.getName().equalsIgnoreCase("7")){
+						   String image="" ;
+						   Ime_fajl="";
+						   comment="";
+						   JSONObject json;
+						   Date d = new Date(System.currentTimeMillis()+5*60*1000);
+						   System.out.println("Ova e format na datum "+System.currentTimeMillis()+5*60*1000);
+						   try 
+						   {
+							  render="";
+						      json = new JSONObject(t_item.getRenderingInfo()); 
 
+						      flag_insert=json.getBoolean("comparisionflag"); 
+							  if (flag_insert==true) {
+							      image = json.getString("comparisionbase64"); 
+							      comment = json.getString("comparisionquestion");
+							      pateka=json.getString("pateka"); 								  
+								   int randomNumber = (int) Math.floor(Math.random() * 1000000);
+								   Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+								   Ime_fajl=ProviderID+randomNumber+timestamp.toString().replace(":", "").replace("-", "").replace(".", "").replace(" ", "");								  
+							      Base64 decoder = new Base64(); 
+							      byte[] imgBytes = Base64.decodeBase64(image);         
+							      FileOutputStream osf = new FileOutputStream(new File("\\\\192.168.1.110\\curandusImages\\"+Ime_fajl+".jpg"));
+							      osf.write(imgBytes); 
+							      osf.close();  
+							      if (pateka=="http://89.205.28.221"){
+							    	  pateka_send="\"http:"+"/"+"/"+"89.205.28.221"+"/"+"curandusImages"+"/"+Ime_fajl+".jpg"+"\"";
+							      }
+							      else
+							      {
+							    	 pateka_send="\"http:"+"/"+"/"+"192.168.1.110"+":"+"8080"+"/"+"curandusImages"+"/"+Ime_fajl+".jpg"+"\"" ;
+							      }
+							      System.out.println("pateka send: "+pateka_send);
+							      render="{comparisionurl:"+pateka_send+",comparisionflag:false, comparisionquestion:"+comment+"}";
+							      System.out.println("RENDER: "+render);
+							      //render="{comparisionurl:"+randomNumber+".jpg,comparisionflag:false}";
+							      json = new JSONObject(render);
+							      System.out.println("json: "+json);
+							      
+							      t_item.setRenderingInfo(json.toString());
+							   }
+						   }
+						   catch(Exception e)
+						   {
+						    e.printStackTrace();
+						    throw e;
+						   }
+					}
+					sendTItems.add(t_item);
+				}
+				
 				connection.setAutoCommit(false);
 				pss =connection.prepareStatement("call InsertUpdateTreatmentItem(?,?,?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS);
-				for(TreatmentItem tt:t_items)
+				for(TreatmentItem tt:sendTItems)
 				{
 					pss.setInt(1,0);
 					pss.setInt(2, p_subTreatmentID);
@@ -549,52 +793,53 @@ public class Project {
 	}
 	
 	public Providers InsertProvider(Connection connection, Providers p_provider) throws Exception
-	{
-		PreparedStatement ps=null;
-		Providers result=new Providers();
-		try
-		{
-		    ps =connection.prepareStatement("call InsertProvider(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-		    ps.setString(1,p_provider.getFirstName());
-		    ps.setString(2,p_provider.getTypeProvider());
-		    ps.setString(3,p_provider.getMiddleInitial());
-		    ps.setString(4,p_provider.getLastName());
-		    ps.setString(5,p_provider.getStreetAdress());
-		    ps.setString(6,p_provider.getCity());
-		    ps.setString(7,p_provider.getState());
-		    ps.setString(8,p_provider.getZip());
-		    ps.setString(9,p_provider.getPhone());
-		    ps.setString(10,p_provider.getAlternatePhone());
-		    ps.setInt(11,NVL(p_provider.getStatus()));
-		    ps.setDate(12,(Date) p_provider.getCreated());
-		    ps.setInt(13,NVL(p_provider.getCreatedBy()));
-		    ps.setDate(14,(Date)p_provider.getModified());
-		    ps.setInt(15,NVL(p_provider.getModifiedBy()));		    
-		    ps.setString(16,p_provider.getDeviceId());
-		    ps.setInt(17,NVL(p_provider.getActivationCode()));
-		    
-			//ps.executeUpdate();
-			
-            //prest.executeUpdate(query, PreparedStatement.RETURN_GENERATED_KEYS); Throws an error
-            //prest.executeQuery(); Throws an error			
-			ResultSet rs = ps.executeQuery();
-			
-			if (rs.next()){
-				p_provider.setProviderId(rs.getInt(1));
-			}
-			return p_provider;
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			throw e;
-		}
+	 {
+	  PreparedStatement ps=null;
+	  Providers result=new Providers();
+	  try
+	  {
+	      ps =connection.prepareStatement("call InsertProvider(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+	      ps.setString(1,p_provider.getFirstName());
+	      ps.setString(2,p_provider.getTypeProvider());
+	      ps.setString(3,p_provider.getMiddleInitial());
+	      ps.setString(4,p_provider.getLastName());
+	      ps.setString(5,p_provider.getStreetAdress());
+	      ps.setString(6,p_provider.getCity());
+	      ps.setString(7,p_provider.getState());
+	      ps.setString(8,p_provider.getZip());
+	      ps.setString(9,p_provider.getPhone());
+	      ps.setString(10,p_provider.getAlternatePhone());
+	      ps.setInt(11,NVL(p_provider.getStatus()));
+	      ps.setDate(12,(Date) p_provider.getCreated());
+	      ps.setInt(13,NVL(p_provider.getCreatedBy()));
+	      ps.setDate(14,(Date)p_provider.getModified());
+	      ps.setInt(15,NVL(p_provider.getModifiedBy()));      
+	      ps.setString(16,p_provider.getDeviceId());
+	      ps.setInt(17,NVL(p_provider.getActivationCode()));
+	      ps.setString(18,p_provider.getChatId());
+	      ps.setString(19,p_provider.getProfileImageUrl());
+	   //ps.executeUpdate();
+	   
+	            //prest.executeUpdate(query, PreparedStatement.RETURN_GENERATED_KEYS); Throws an error
+	            //prest.executeQuery(); Throws an error   
+	   ResultSet rs = ps.executeQuery();
+	   
+	   if (rs.next()){
+	    p_provider.setProviderId(rs.getInt(1));
+	   }
+	   return p_provider;
+	  }
+	  catch(Exception e)
+	  {
+	   e.printStackTrace();
+	   throw e;
+	  }
 
-		finally {
-				ps.close();
-		      connection.close();
-		}
-	}
+	  finally {
+	    ps.close();
+	        connection.close();
+	  }
+	 }
 	
 	public List<PatientsCascade> getPatientsByProvider(Connection connection, int PatientID) throws Exception
 	{
@@ -618,7 +863,9 @@ public class Project {
 										rs.getString(4),
 										rs.getString(5),
 										rs.getInt(6),
-										rs.getInt(7)
+										rs.getInt(7),
+										rs.getString(8),
+										rs.getString(9)
 										);
 					t_items.add(p_eden);
 				}
@@ -642,16 +889,19 @@ public class Project {
 			}
 	}	
 	
-	public boolean AddContactPatient(Connection connection, Integer providerid, String telephoneNumber, String firstName, String lastName) throws Exception
+	public boolean AddContactPatient(Connection connection, Integer providerid, String telephoneNumber, 
+			String firstName, String lastName,  String ChatId, String RoomId) throws Exception
 	{
 		PreparedStatement ps=null;
 		try
 		{
-		    ps =connection.prepareStatement("call AddPatientContact(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+		    ps =connection.prepareStatement("call AddPatientContact(?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 		    ps.setInt(1,providerid);
 		    ps.setString(2,telephoneNumber);
 			ps.setString(3,firstName);
 			ps.setString(4,lastName);	
+			ps.setString(5,ChatId);	
+			ps.setString(6,RoomId);	
 			//ps.setString(4,"0");
 			ps.executeUpdate();
 			
@@ -677,21 +927,20 @@ public class Project {
 	}	
 	
 	
-	public boolean AddContactDoctor(Connection connection, Integer providerid, String telephoneNumber, String firstName, String lastName) throws Exception
+	public boolean AddContactDoctor(Connection connection, Integer providerid, String telephoneNumber, 
+			String firstName, String lastName, String ChatId, String RoomId) throws Exception
 	{
 		PreparedStatement ps=null;
 		try
 		{
 			System.out.println("Prvo");
-			//String uname = request.getParameter("uname");
-		    ps =connection.prepareStatement("call AddProviderContact(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-		    //ps =connection.prepareStatement("INSERT INTO PROVIDERS(FirstName,LastName,Phone,Status) VALUES(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-			//connection.prepareStatement("SELECT name,countrycode,district FROM city where countrycode=?");
-			
+		    ps =connection.prepareStatement("call AddProviderContact(?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 		    ps.setInt(1,providerid);
 		    ps.setString(2,telephoneNumber);
 			ps.setString(3,firstName);
-			ps.setString(4,lastName);	
+			ps.setString(4,lastName);
+			ps.setString(5,ChatId);
+			ps.setString(6,RoomId);
 			//ps.setString(4,"0");
 			ps.executeUpdate();
 			
@@ -812,7 +1061,8 @@ public class Project {
 										rs.getDate(14),
 										rs.getInt(15),
 										rs.getDate(16),
-										rs.getInt(17)
+										rs.getInt(17),
+										rs.getString(18)
 										);
 					t_items = p_eden;
 				}
@@ -925,8 +1175,11 @@ public class Project {
 							rs.getDate(6),
 							rs.getInt(7),
 							rs.getDate(8),
-							rs.getInt(9)
-										);
+							rs.getInt(9),
+							rs.getString(10),
+							rs.getString(11),
+							rs.getInt(12)
+							);
 					t_items.add(p_eden);
 				}
 				
@@ -987,53 +1240,55 @@ public class Project {
 	
 	
 	///// tuka api activation
-	public Providers CheckProviderActivationKey(Connection connection, String deviceId , String phone , int inputCode) throws Exception
-	{
-		PreparedStatement ps=null;
-		Providers result=new Providers();
-		try
-		{
-		    ps =connection.prepareStatement("call CheckProviderActivationKey(?,?,?)", Statement.RETURN_GENERATED_KEYS);
-		    ps.setString(1,deviceId);
-		    ps.setString(2,phone);
-		    ps.setInt(3, inputCode);
-		   		
-			ResultSet rs = ps.executeQuery();
-			
-			if (rs.next()){
-				result.setProviderId(rs.getInt(1));
-				result.setFirstName(rs.getString(2));
-				result.setTypeProvider(rs.getString(3));
-				result.setMiddleInitial(rs.getString(4));
-				result.setLastName(rs.getString(5));
-				result.setStreetAdress(rs.getString(6));
-				result.setCity(rs.getString(7));
-				result.setState(rs.getString(8));
-				result.setZip(rs.getString(9));
-				result.setPhone(rs.getString(10));
-				result.setAlternatePhone(rs.getString(11));
-				result.setStatus(rs.getInt(12));
-				result.setCreated(rs.getDate(13));
-				result.setCreatedBy(rs.getInt(14));
-				result.setModified(rs.getDate(15));
-				result.setModifiedBy(rs.getInt(16));
-				result.setDeviceId(rs.getString(17));
-				result.setActivationCode(rs.getInt(18));
-				
-			}
-			return result;
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			throw e;
-		}
+	 public Providers CheckProviderActivationKey(Connection connection, String deviceId , String phone , int inputCode) throws Exception
+	 {
+	  PreparedStatement ps=null;
+	  Providers result=new Providers();
+	  try
+	  {
+	      ps =connection.prepareStatement("call CheckProviderActivationKey(?,?,?)", Statement.RETURN_GENERATED_KEYS);
+	      ps.setString(1,deviceId);
+	      ps.setString(2,phone);
+	      ps.setInt(3, inputCode);
+	       
+	   ResultSet rs = ps.executeQuery();
+	   
+	   if (rs.next()){
+	    result.setProviderId(rs.getInt(1));
+	    result.setFirstName(rs.getString(2));
+	    result.setTypeProvider(rs.getString(3));
+	    result.setMiddleInitial(rs.getString(4));
+	    result.setLastName(rs.getString(5));
+	    result.setStreetAdress(rs.getString(6));
+	    result.setCity(rs.getString(7));
+	    result.setState(rs.getString(8));
+	    result.setZip(rs.getString(9));
+	    result.setPhone(rs.getString(10));
+	    result.setAlternatePhone(rs.getString(11));
+	    result.setStatus(rs.getInt(12));
+	    result.setCreated(rs.getDate(13));
+	    result.setCreatedBy(rs.getInt(14));
+	    result.setModified(rs.getDate(15));
+	    result.setModifiedBy(rs.getInt(16));
+	    result.setDeviceId(rs.getString(17));
+	    result.setActivationCode(rs.getInt(18));
+	    result.setChatId(rs.getString(19));
+	    result.setProfileImageUrl(rs.getString(20));
+	    
+	   }
+	   return result;
+	  }
+	  catch(Exception e)
+	  {
+	   e.printStackTrace();
+	   throw e;
+	  }
 
-		finally {
-				ps.close();
-		      connection.close();
-		}
-	}
+	  finally {
+	    ps.close();
+	        connection.close();
+	  }
+	 }
 	
 	public SavedTemplate DeleteSavedTemplate(Connection connection, int savedtreatmentdetail,int savedtreatmenttemplateid) throws Exception
 	{
@@ -1079,97 +1334,43 @@ public class Project {
 	}
 	
 	/// Insert base64 image and save locally
-	public int InsertBase64Image(Connection connection, TreatmentItem t_item) throws Exception
-	{	
-		System.out.println("Vlezeeee");
-		PreparedStatement ps=null; 
-		TreatmentItem p_eden=new TreatmentItem();
-		int p_savedTreatmentID;	
-		String image="" ;
-		JSONObject json;
-		int randomNumber = (int) Math.floor(Math.random() * 101);
-		System.out.println("Vlezeeee"+randomNumber);
-		try 
-		{
-			ps = connection.prepareStatement("call InsertTreatmentItemImage(?,?,?,?,?,?,?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS);
-		    
-			ps.setInt(1,t_item.getSubtreatmentid()); 
-		    ps.setString(2, t_item.getName() ); 
-		    ps.setString(3, t_item.getTypeT() ); 
-		    ps.setString(4, t_item.getRepeatT() ); 
-		    ps.setString(5, t_item.getDuration() ); 
-		    ps.setString(6, t_item.getRenderingInfo() ); 
-		    ps.setString(7, t_item.getStatus()); 
-		    ps.setDate(8, (Date) t_item.getCreated() );
-		    ps.setInt(9,t_item.getCreatedBy() ); 
-		    ps.setDate(10,(Date) t_item.getModified() ); 
-		    ps.setInt(11 ,t_item.getModifiedBy() ); 
-		    	//System.out.println("OVA E SUBTREATMENT ITEM: "+t_item.getSubtreatmentid());
-		    	//System.out.println("OVA E  IME: "+ t_item.getName());
-		    	image = t_item.getRenderingInfo();
-		    	//System.out.println("OVA e slikata: "+t_item.getRenderingInfo());
-		    	
-		    	System.out.println("OVA pred gson ");
-				Gson gson = new Gson();
-				json = new JSONObject(t_item.getRenderingInfo());
-				image = json.getString("base64");
-				System.out.println("Prvi 50 "+image.substring(0, 50));
-				System.out.println("Posledni 50 "+image.substring(image.length()-50, image.length()-1));
-		    	 try{ 
-		    		 Base64 decoder = new Base64();
-		    		 byte[] imgBytes = Base64.decodeBase64(image);
-		    				 
-		    		// decoder.decode(image); //.substring(image.lastIndexOf(",") + 1,image.length()-1));
-		    		 System.out.println("OVA e img bytes: "+imgBytes);
-		    		 //System.out.println("STRINGOT : "+image.substring(image.lastIndexOf(",") + 1,image.length()-1));
-		    		// FileOutputStream osf = new FileOutputStream(new File("\\\\192.168.1.165\\Razmena\\curandusImages\\"+Integer.toString(randomNumber)+".jpg"));
-			    //	FileOutputStream osf = new FileOutputStream(new File("http"//89.205.28.221/curandusImages/"+Integer.toString(randomNumber)+".jpg"));
-			    	FileOutputStream osf = new FileOutputStream(new File("\\\\192.168.1.110\\curandusImages\\"+Integer.toString(randomNumber)+".jpg"));
+	 public int InsertBase64Image(Connection connection, TreatmentItem t_item) throws Exception
+	  { 
+	   System.out.println("Vlezeeee");
+	   PreparedStatement ps=null; 
+	   TreatmentItem p_eden=new TreatmentItem();
+	   int p_savedTreatmentID; 
+	   String image="" ;
+	   JSONObject json;
+	   int randomNumber = (int) Math.floor(Math.random() * 101);
+	   System.out.println("Vlezeeee i ova e random number: "+randomNumber);
+	   
+	   Date d = new Date(System.currentTimeMillis()+5*60*1000);
+	   System.out.println("Ova e format na datum "+System.currentTimeMillis()+5*60*1000);
+	   try 
+	   {
 
-		    		 osf.write(imgBytes); 
-		    		// osf.flush(); 
-		    		 osf.close(); 
-		    		 System.out.println("OVA e slikata vo bajti: "+imgBytes); 
-		    	    } 
-		    	    catch (Exception e) { 
-						e.printStackTrace();
-						throw e;          
-		    	    }
-				ResultSet rs = ps.executeQuery(); 
-				connection.setAutoCommit(false); 
-				
-				//System.out.println("REZULTAT: "+rs);				
-//				if(rs.next()){
-//					 p_eden = new TreatmentItem(
-//										rs.getInt(1),
-//										rs.getInt(2),
-//										rs.getString(3),
-//										rs.getString(4),
-//										rs.getString(5),
-//										rs.getString(6),
-//										"{\"code\":\""+randomNumber+"\"}",										
-//										rs.getString(8),
-//										rs.getDate(9),
-//										rs.getInt(10),
-//										rs.getDate(11),
-//										rs.getInt(12)
-//										);
-//					connection.commit(); 
-//						
-//				}
-				 //System.out.println("OVA e tretment item: "+randomNumber); 
-				return randomNumber;	
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			throw e;
-		}
-		finally {
-				ps.close();
-				connection.close();
-		}
-	}	
+	         image = t_item.getRenderingInfo(); 
+	      Gson gson = new Gson(); 
+	      json = new JSONObject(t_item.getRenderingInfo()); 
+	      image = json.getString("base64"); 
+	         Base64 decoder = new Base64(); 
+	      byte[] imgBytes = Base64.decodeBase64(image);         
+	      FileOutputStream osf = new FileOutputStream(new File("\\\\192.168.1.110\\curandusImages\\"+Integer.toString(randomNumber)+".jpg"));
+	      osf.write(imgBytes); 
+	      osf.close(); 
+	      System.out.println("OVA e slikata vo bajti: "+imgBytes); 
+	           
+	        
+
+	     return randomNumber; 
+	   }
+	   catch(Exception e)
+	   {
+	    e.printStackTrace();
+	    throw e;
+	   }
+	  }	
 	
 	
 	
@@ -1246,5 +1447,33 @@ public class Project {
 		}
 	}
 	
-	
+	public void updateProviderImageUrl(Connection connection, int providerId, String imageUrl ) throws Exception
+	 { 
+	  connection.setAutoCommit(false);
+	  PreparedStatement pss=null;
+	  System.out.println("start");
+	    Gson gson = new Gson();
+	   try{
+	    pss =connection.prepareStatement("call UpdateProvider(?,?)",Statement.RETURN_GENERATED_KEYS); 
+	    pss.setInt(1,providerId); 
+	    pss.setString(2,imageUrl); 
+	    
+	    ResultSet rs = pss.executeQuery(); 
+	    System.out.println("Tuka rezultat"+pss.toString()); 
+	       
+	    connection.commit(); 
+	    
+	  }
+	  catch(Exception e)
+	  {
+	   connection.rollback();
+	   e.printStackTrace();
+	   throw e;
+	  }
+
+	  finally {
+	    pss.close();
+	    connection.close();
+	  }
+	 }	
 }

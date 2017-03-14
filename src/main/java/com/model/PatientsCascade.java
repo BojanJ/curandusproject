@@ -10,12 +10,14 @@ public class PatientsCascade {
 	//private Set<Providerpatient> providerpatients = new HashSet<Providerpatient>(0);
 	private Integer activetreatmenId;
 	private Integer subtreatmentid;
+	private String ChatId;
+	private String RoomId;
 
 	public PatientsCascade() {
 	}
 
 	public PatientsCascade(Integer patientId, String phone, String firstName, String middleInitial, String lastName,
-			Integer activetreatmenId, Integer subtreatmentid) {
+			Integer activetreatmenId, Integer subtreatmentid, String chatId, String roomId) {
 		super();
 		this.patientId = patientId;
 		this.phone = phone;
@@ -24,6 +26,8 @@ public class PatientsCascade {
 		this.lastName = lastName;
 		this.activetreatmenId = activetreatmenId;
 		this.subtreatmentid = subtreatmentid;
+		ChatId = chatId;
+		RoomId = roomId;
 	}
 
 	public Integer getPatientId() {
@@ -81,4 +85,21 @@ public class PatientsCascade {
 	public void setSubtreatmentid(Integer subtreatmentid) {
 		this.subtreatmentid = subtreatmentid;
 	}
+
+	public String getChatId() {
+		return ChatId;
+	}
+
+	public void setChatId(String chatId) {
+		ChatId = chatId;
+	}
+
+	public String getRoomId() {
+		return RoomId;
+	}
+
+	public void setRoomId(String roomId) {
+		RoomId = roomId;
+	}
+
 }

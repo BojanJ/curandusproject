@@ -22,13 +22,14 @@ public class Patients {
 	private int CreatedBy ;
 	private Date Modified ;
 	private int ModifiedBy;
+	private String ChatId; 
 	
 	public Patients(){}
-	
+
 	public Patients(int patientId, String phone, String firstName, String middleInitial, String lastName,
 			String streetAddress, String city, String state, String zIP, String chronicDiseases, String allergies,
 			String medicationsThatRecieves, String profileImageUrl, String additionalInnfo, Date created, int createdBy,
-			Date modified, int modifiedBy) {
+			Date modified, int modifiedBy, String chatId) {
 		super();
 		PatientId = patientId;
 		Phone = phone;
@@ -48,6 +49,7 @@ public class Patients {
 		CreatedBy = createdBy;
 		Modified = modified;
 		ModifiedBy = modifiedBy;
+		ChatId = chatId;
 	}
 
 	public int getPatientId() {
@@ -192,10 +194,15 @@ public class Patients {
 
 	public void setModifiedBy(int modifiedBy) {
 		ModifiedBy = modifiedBy;
-	} 
-	
-	
-	
+	}
+
+	public String getChatId() {
+		return ChatId;
+	}
+
+	public void setChatId(String chatId) {
+		ChatId = chatId;
+	}
 	
 	
 }

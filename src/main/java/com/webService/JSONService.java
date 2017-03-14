@@ -53,6 +53,27 @@ public class JSONService {
 //	}
 	
 	@GET
+	@Path("/sendsms/to={phoneto}&body={body}")
+	@Produces("application/json")
+	public String SendSMS(@PathParam("phoneto") String phoneto,@PathParam("body") String body) throws Exception  {	
+		ProjectManager projectManager= new ProjectManager();
+		boolean flag = false;
+		String ret_str = null;
+		try {
+			flag = projectManager.SendSMS(phoneto, body);
+			Gson gson = new Gson();
+			System.out.println(gson.toJson(flag));
+			ret_str = gson.toJson(flag);
+			return ret_str;
+		} 
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}	
+	}	
+	
+	@GET
 	@Path("/getsavedtreatmenttemplatebyprovider/{ProviderDetail}")
 	@Produces("application/json")
    public String getSavedTemplate(@PathParam("ProviderDetail")int ProviderDetail)
@@ -321,17 +342,19 @@ public class JSONService {
 	}
 	
 	@POST
-	@Path("/addcontactpatient/providerId={providerID}&phone={phone}&firstName={firstName}&lastName={lastName}")	
+	@Path("/addcontactpatient/providerId={providerID}&phone={phone}&firstName={firstName}"
+			+ "&lastName={lastName}&chatid={chatid}&roomid={roomid}")	
 	@Produces("application/json")
    public String AddContactPatient(@PathParam("providerID")int providerID, @PathParam("phone")String phone,
-			@PathParam("firstName")String firstName, @PathParam("lastName")String lastName)
+			@PathParam("firstName")String firstName, @PathParam("lastName")String lastName,
+			@PathParam("chatid")String chatid, @PathParam("roomid")String roomid)
 	{
 		boolean flag=false;
 		String t_tems_str = null;
 		try 
 		{
 			ProjectManager projectManager= new ProjectManager();
-			flag = projectManager.AddContactPatient(providerID, phone, firstName, lastName);
+			flag = projectManager.AddContactPatient(providerID, phone, firstName, lastName, chatid, roomid);
 			//System.out.println("flag: "+flag);
 			Gson gson = new Gson();
 			System.out.println(gson.toJson(flag));
@@ -346,10 +369,12 @@ public class JSONService {
 	}		
 	
 	@POST
-	@Path("/addcontactdoctor/providerId={providerID}&phone={phone}&firstName={firstName}&lastName={lastName}")	
+	@Path("/addcontactdoctor/providerId={providerID}&phone={phone}&firstName={firstName}"
+			+ "&lastName={lastName}&chatid={chatid}&roomid={roomid}")	
 	@Produces("application/json")
    public String AddContactDoctor(@PathParam("providerID")int providerID, @PathParam("phone")String phone,
-			@PathParam("firstName")String firstName, @PathParam("lastName")String lastName)
+			@PathParam("firstName")String firstName, @PathParam("lastName")String lastName,
+			@PathParam("chatid")String chatid, @PathParam("roomid")String roomid)
 	{
 		boolean flag=false;
 		List<Providers> t_items = null;
@@ -357,7 +382,7 @@ public class JSONService {
 		try 
 		{
 			ProjectManager projectManager= new ProjectManager();
-			flag = projectManager.AddContactDoctor(providerID, phone, firstName, lastName);
+			flag = projectManager.AddContactDoctor(providerID, phone, firstName, lastName, chatid, roomid);
 			//t_items = projectManager.AddContactDoctor(providerID, phone, firstName, lastName);
 			//StringBuffer sb = new StringBuffer();
 			Gson gson = new Gson();
@@ -612,8 +637,22 @@ public class JSONService {
 	}
 	
 	
-	
-	
-
-	
+	@GET
+	 @Path("/updateProviderImageUrl/{providerId}&&{imageUrl}")
+	 @Consumes(MediaType.APPLICATION_JSON)
+	 public void updateProviderImageUrl(@PathParam("providerId") Integer providerId,@PathParam("imageUrl") String imageUrl) throws Exception  { 
+	  ProjectManager projectManager= new ProjectManager();
+	  boolean flag = false;
+	  String t_tems_str = null;
+	  try {
+	    projectManager.updateProviderImageUrl( providerId, imageUrl);
+	   } 
+	  
+	  catch(Exception e)
+	  {
+	   e.printStackTrace();
+	   throw e;
+	  } 
+	  
+	 }	
 }
